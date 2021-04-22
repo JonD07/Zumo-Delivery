@@ -16,23 +16,23 @@
 # Run "make help" for target help.
 
 # Name of the main c file and resulting executable
-TARGET       = Lab5-Control
+TARGET       = Main
 
-#	${MEGN_C_LIB_PATH}/Link_List.c\
-#	${MEGN_C_LIB_PATH}/Task_Scheduler.c\
+#	${MEGN_DRIVER_PATH}/Link_List.c\
+#	${MEGN_DRIVER_PATH}/Task_Scheduler.c\
 
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c       \
-	$(MEGN_C_LIB_PATH)/SerialIO.c			\
-	$(MEGN_C_LIB_PATH)/Ring_Buffer.c		\
-	$(MEGN_C_LIB_PATH)/MEGN540_MessageHandeling.c \
-	$(MEGN_C_LIB_PATH)/Timing.c				\
-	${MEGN_C_LIB_PATH}/Encoder.c \
-	${MEGN_C_LIB_PATH}/MotorPWM.c\
-	${MEGN_C_LIB_PATH}/Battery_Monitor.c \
-	${MEGN_C_LIB_PATH}/Filter.c\
-	${MEGN_C_LIB_PATH}/Controller.c\
-	$(MEGN_C_LIB_PATH)/USB_Config/Descriptors.c       \
+	$(MEGN_DRIVER_PATH)/SerialIO.c			\
+	$(MEGN_DRIVER_PATH)/Ring_Buffer.c		\
+	$(MEGN_DRIVER_PATH)/MEGN540_MessageHandeling.c \
+	$(MEGN_DRIVER_PATH)/Timing.c				\
+	${MEGN_DRIVER_PATH}/Encoder.c \
+	${MEGN_DRIVER_PATH}/MotorPWM.c\
+	${MEGN_DRIVER_PATH}/Battery_Monitor.c \
+	${MEGN_DRIVER_PATH}/Filter.c\
+	${MEGN_DRIVER_PATH}/Controller.c\
+	$(MEGN_DRIVER_PATH)/USB_Config/Descriptors.c       \
 	$(LUFA_SRC_USB)
 
 # List C++ source files here. (C dependencies are automatically generated.)
@@ -41,13 +41,13 @@ CPPSRC =
 # Ohter Include Directories of importance
 LUFA_DIR     = ../lufa
 LUFA_PATH    = $(LUFA_DIR)/LUFA
-MEGN_C_LIB_PATH = ../c_lib
+MEGN_DRIVER_PATH = ../Driver
 
 # List any extra directories to look for include files here.
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = $(LUFA_DIR) $(MEGN_C_LIB_PATH) $(MEGN_C_LIB_PATH)/USB_Config
+EXTRAINCDIRS = $(LUFA_DIR) $(MEGN_DRIVER_PATH) $(MEGN_DRIVER_PATH)/USB_Config
 
 #  Micro-Controller and USB Information
 MCU          = atmega32u4

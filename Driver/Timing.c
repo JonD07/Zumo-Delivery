@@ -28,7 +28,7 @@
 
 */
 
-#include "../c_lib/Timing.h"
+#include "Timing.h"
 
 
 /** These define the internal counters that will be updated in the ISR to keep track of the time

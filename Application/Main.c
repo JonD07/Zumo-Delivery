@@ -28,14 +28,14 @@
 
 */
 
-#include "../c_lib/SerialIO.h"
-#include "../c_lib/MEGN540_MessageHandeling.h"
-#include "../c_lib/Timing.h"
-#include "../c_lib/Encoder.h"
-#include "../c_lib/MotorPWM.h"
-#include "../c_lib/Filter.h"
-#include "../c_lib/Battery_Monitor.h"
-#include "../c_lib/Controller.h"
+#include "../Driver/SerialIO.h"
+#include "../Driver/MEGN540_MessageHandeling.h"
+#include "../Driver/Timing.h"
+#include "../Driver/Encoder.h"
+#include "../Driver/MotorPWM.h"
+#include "../Driver/Filter.h"
+#include "../Driver/Battery_Monitor.h"
+#include "../Driver/Controller.h"
 // #include "../c_lib/Task_Scheduler.h"
 
 #define DEBUG		0
