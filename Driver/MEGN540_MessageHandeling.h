@@ -44,6 +44,10 @@
 
 #include <math.h>
 
+#define WHEEL_BASE		0.098
+#define HALF_WHEEL_BASE	0.049
+#define TURN_SPEED		0.1
+
 /** Message Driven State Machine Flags */
 typedef struct MSG_FLAG { bool active; float duration; Time_t last_trigger_time; } MSG_FLAG_t;
 
@@ -81,6 +85,14 @@ void Message_Handling_Init();
  * @return
  */
 void Message_Handling_Task();
+
+/*
+ * Helper functions to convert between velocities and duty cycles
+ */
+float DutyCycle_to_Velocity_Left(int duty_cycle);
+float DutyCycle_to_Velocity_Right(int duty_cycle);
+int Velocity_to_DutyCycle_Left(float velocity);
+int Velocity_to_DutyCycle_Right(float velocity);
 
 /**
  * Function MEGN540_Message_Len returns the number of bytes associated with a command string per the

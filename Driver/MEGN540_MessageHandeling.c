@@ -508,16 +508,68 @@ void Message_Handling_Task()
 			// Check power levels
 			if(bat_val >= 4.75)
 			{
-				// Assign linear position
-				Controller_Set_Target_Position(&ctr_LeftMotor, data.linear);
-				Controller_Set_Target_Position(&ctr_RightMotor, data.linear);
-				// Set the desired velocity to 75% PWM
-				Controller_Set_Target_Velocity(&ctr_LeftMotor, 0.2608);
-				Controller_Set_Target_Velocity(&ctr_RightMotor, 0.2683);
-				Zero_Encoders();
+				float distance_left = 0;
+				float distance_right = 0;
+				float velocity_left = 0;
+				float velocity_right = 0;
 
-				// TODO Assign angular position
-				// Check sign of angular (+ is ccw, - is cw)
+				if(data.angular == 0) {
+					// Assign linear position
+					distance_left = data.linear;
+					distance_right = data.linear;
+					// Set the desired velocity to 75% PWM
+					velocity_left = DutyCycle_to_Velocity_Left(75);
+					velocity_right = DutyCycle_to_Velocity_Right(75);
+				}
+				else {
+					/// Move car around circle
+					if(data.linear <= WHEEL_BASE) {
+						// Just spin
+						if(data.angular > 0) {
+							// Spin left
+							distance_left = -1 * HALF_WHEEL_BASE * data.angular;
+							distance_right = HALF_WHEEL_BASE * data.angular;
+						}
+						else {
+							// Spin right
+							distance_left = HALF_WHEEL_BASE * data.angular;
+							distance_right = -1 * HALF_WHEEL_BASE * data.angular;
+						}
+
+						// Set the desired velocity to 25% PWM
+						velocity_left = DutyCycle_to_Velocity_Left(25);
+						velocity_right = DutyCycle_to_Velocity_Right(25);
+					}
+					else {
+						// Determine distance and velocity to travel on left and right
+						if(data.angular > 0) { // Turn left
+							// left_distance = r*theta, right_distance = (r - wheel_base)*theta
+							distance_left = (data.linear - WHEEL_BASE) * data.angular;
+							distance_right = data.linear * data.angular;
+							// Determine the velocity of each wheel based on velocity of outer wheel
+							float dt = distance_right/TURN_SPEED;
+							velocity_left = distance_left/dt;
+							velocity_right = TURN_SPEED;
+						}
+						else { // Turn right
+							// left_distance = (r - wheel_base)*theta, right_distance = r*theta
+							distance_left = data.linear * data.angular;
+							distance_right = (data.linear - WHEEL_BASE) * data.angular;
+							// Determine the velocity of each wheel based on velocity of outer wheel
+							float dt = distance_left/TURN_SPEED;
+							velocity_left = TURN_SPEED;
+							velocity_right = distance_right/dt;
+						}
+					}
+				}
+
+				// Assign linear position
+				Controller_Set_Target_Position(&ctr_LeftMotor, distance_left);
+				Controller_Set_Target_Position(&ctr_RightMotor, distance_right);
+				// Assign target velocity
+				Controller_Set_Target_Velocity(&ctr_LeftMotor, velocity_left);
+				Controller_Set_Target_Velocity(&ctr_RightMotor, velocity_right);
+				Zero_Encoders();
 
 				// Set flags
 				mf_motor_dist_control.active = true;
@@ -755,6 +807,22 @@ void Message_Handling_Task()
 
 		break;
 	}
+}
+
+float DutyCycle_to_Velocity_Left(int duty_cycle) {
+	return ((float)duty_cycle * 0.0033) + 0.0133;
+}
+
+float DutyCycle_to_Velocity_Right(int duty_cycle) {
+	return ((float)duty_cycle * 0.0034) + 0.0133;
+}
+
+int Velocity_to_DutyCycle_Left(float velocity) {
+	return (int)((velocity - 0.0133)/0.0033);
+}
+
+int Velocity_to_DutyCycle_Right(float velocity) {
+	return (int)((velocity - 0.0133)/0.0033);
 }
 
 
