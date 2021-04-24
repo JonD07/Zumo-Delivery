@@ -38,7 +38,7 @@
 #include "../Driver/Controller.h"
 // #include "../c_lib/Task_Scheduler.h"
 
-#define DEBUG		0
+#define DEBUG		1
 #define CNTRL_SYS	1
 #define KP_L		0.1875335
 #define KP_R		0.1728258
@@ -348,25 +348,32 @@ int main(void)
 				}
 				else
 				{
-					// Update controller
-					time_new = GetTimeSec();
-					Controller_Set_Target_Position(&ctr_LeftMotor, ctr_LeftMotor.target_pos - measured_left);
-					Controller_Set_Target_Position(&ctr_RightMotor, ctr_RightMotor.target_pos - measured_right);
-
 					int16_t pwmL = 0;
 					int16_t pwmR = 0;
+					time_new = GetTimeSec();
+					float dt = time_new - time_old;
+
+					// Update target position
+					Controller_Set_Target_Position(&ctr_LeftMotor,
+							(ctr_LeftMotor.target_pos - measured_left));
+					Controller_Set_Target_Position(&ctr_RightMotor,
+							(ctr_RightMotor.target_pos - measured_right));
 
 					if(CNTRL_SYS) {
-						float new_speedR = Controller_Update(&ctr_RightMotor, measured_right, (time_new - time_old));
-						float new_speedL = Controller_Update(&ctr_LeftMotor, measured_left, (time_new - time_old));
+						/// Update controller
+						// Correct to keep measurement positive in controller
+						float mL = (measured_left < 0) ? (-1*measured_left) : measured_left;
+						float mR = (measured_right < 0) ? (-1*measured_right) : measured_right;
+						float new_speedL = Controller_Update(&ctr_LeftMotor, mL, dt);
+						float new_speedR = Controller_Update(&ctr_RightMotor, mR, dt);
 						// Determine new PWM with sign for direction
-						pwmL =  (int16_t)((new_speedL - 0.0133) / 0.0033);
-						pwmR =  (int16_t)((new_speedR - 0.0133) / 0.0034);
+						pwmL = Velocity_to_DutyCycle_Left(new_speedL);
+						pwmR =  Velocity_to_DutyCycle_Right(new_speedR);
 					}
 					else {
 						// Just use given velocity
-						pwmL =  (int16_t)((ctr_LeftMotor.target_vel - 0.0133) / 0.0033);
-						pwmR =  (int16_t)((ctr_RightMotor.target_vel - 0.0133) / 0.0034);
+						pwmL = Velocity_to_DutyCycle_Left(ctr_LeftMotor.target_vel);
+						pwmR =  Velocity_to_DutyCycle_Right(ctr_RightMotor.target_vel);
 					}
 
 					pwmL = (ctr_LeftMotor.target_pos > 0) ? pwmL : -1 * pwmL;

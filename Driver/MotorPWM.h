@@ -117,4 +117,12 @@ uint16_t Get_MAX_Motor_PWM();
  */
 void Set_MAX_Motor_PWM( uint16_t MAX_PWM );
 
+/*
+ * Helper functions to convert between velocities and duty cycles
+ */
+float DutyCycle_to_Velocity_Left(int duty_cycle);
+float DutyCycle_to_Velocity_Right(int duty_cycle);
+int Velocity_to_DutyCycle_Left(float velocity);
+int Velocity_to_DutyCycle_Right(float velocity);
+
 #endif

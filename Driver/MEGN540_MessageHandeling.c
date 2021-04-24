@@ -513,7 +513,8 @@ void Message_Handling_Task()
 				float velocity_left = 0;
 				float velocity_right = 0;
 
-				if(data.angular == 0) {
+				if((data.angular < 0.01) && (data.angular > -0.01)) {
+					// Drive straight
 					// Assign linear position
 					distance_left = data.linear;
 					distance_right = data.linear;
@@ -522,43 +523,57 @@ void Message_Handling_Task()
 					velocity_right = DutyCycle_to_Velocity_Right(75);
 				}
 				else {
+					if(data.linear < 0) {
+						// Don't accept negative distances in turns, just set to positive
+						data.linear *= -1;
+					}
+
 					/// Move car around circle
-					if(data.linear <= WHEEL_BASE) {
+					if(data.linear < MIN_TURN_ARC) {
 						// Just spin
+						float d = HALF_WHEEL_BASE * data.angular;
 						if(data.angular > 0) {
 							// Spin left
-							distance_left = -1 * HALF_WHEEL_BASE * data.angular;
-							distance_right = HALF_WHEEL_BASE * data.angular;
+							distance_left = -1 * d;
+							distance_right = d;
 						}
 						else {
 							// Spin right
-							distance_left = HALF_WHEEL_BASE * data.angular;
-							distance_right = -1 * HALF_WHEEL_BASE * data.angular;
+							distance_left = d;
+							distance_right = -1 * d;
 						}
 
 						// Set the desired velocity to 25% PWM
-						velocity_left = DutyCycle_to_Velocity_Left(25);
-						velocity_right = DutyCycle_to_Velocity_Right(25);
+						velocity_left = DutyCycle_to_Velocity_Left(SPIN_DUTYCYLE);
+						velocity_right = DutyCycle_to_Velocity_Right(SPIN_DUTYCYLE);
 					}
 					else {
 						// Determine distance and velocity to travel on left and right
 						if(data.angular > 0) { // Turn left
-							// left_distance = r*theta, right_distance = (r - wheel_base)*theta
-							distance_left = (data.linear - WHEEL_BASE) * data.angular;
-							distance_right = data.linear * data.angular;
-							// Determine the velocity of each wheel based on velocity of outer wheel
-							float dt = distance_right/TURN_SPEED;
-							velocity_left = distance_left/dt;
-							velocity_right = TURN_SPEED;
+							// Arc length of inner track based on given distance
+							distance_left = data.linear;
+							// Arc length of outer track based on radius of turn & given angle
+							float r = (data.linear/data.angular);
+							distance_right = data.angular * (r + WHEEL_BASE);
+
+							// Set velocities
+							velocity_left = TURN_VELOCITY;
+							float dt = distance_left/TURN_VELOCITY;
+							velocity_right = distance_right/dt;
 						}
 						else { // Turn right
-							// left_distance = (r - wheel_base)*theta, right_distance = r*theta
-							distance_left = data.linear * data.angular;
-							distance_right = (data.linear - WHEEL_BASE) * data.angular;
-							// Determine the velocity of each wheel based on velocity of outer wheel
-							float dt = distance_left/TURN_SPEED;
-							velocity_left = TURN_SPEED;
-							velocity_right = distance_right/dt;
+							// Correct angle for math
+							data.angular *= -1;
+							// Arc length of inner track based on given distance
+							distance_right = data.linear;
+							// Arc length of outer track based on radius of turn & given angle
+							float r = (data.linear/data.angular);
+							distance_left = data.angular * (r + WHEEL_BASE);
+
+							// Set velocities
+							velocity_right = TURN_VELOCITY;
+							float dt = distance_right/TURN_VELOCITY;
+							velocity_left = distance_left/dt;
 						}
 					}
 				}
@@ -807,22 +822,6 @@ void Message_Handling_Task()
 
 		break;
 	}
-}
-
-float DutyCycle_to_Velocity_Left(int duty_cycle) {
-	return ((float)duty_cycle * 0.0033) + 0.0133;
-}
-
-float DutyCycle_to_Velocity_Right(int duty_cycle) {
-	return ((float)duty_cycle * 0.0034) + 0.0133;
-}
-
-int Velocity_to_DutyCycle_Left(float velocity) {
-	return (int)((velocity - 0.0133)/0.0033);
-}
-
-int Velocity_to_DutyCycle_Right(float velocity) {
-	return (int)((velocity - 0.0133)/0.0033);
 }
 
 
