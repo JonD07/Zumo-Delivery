@@ -514,6 +514,10 @@ void Message_Handling_Task()
 				float velocity_right = 0;
 
 				if((data.angular < 0.01) && (data.angular > -0.01)) {
+					if(1) {
+						char out_put[] = {'G','o',' ','S','t','r'};
+						usb_send_msg("cccccc", command, &out_put, sizeof(out_put));
+					}
 					// Drive straight
 					// Assign linear position
 					distance_left = data.linear;
@@ -523,6 +527,10 @@ void Message_Handling_Task()
 					velocity_right = DutyCycle_to_Velocity_Right(75);
 				}
 				else {
+					if(1) {
+						char out_put[] = {'T','u','r','n'};
+						usb_send_msg("ccccc", command, &out_put, sizeof(out_put));
+					}
 					if(data.linear < 0) {
 						// Don't accept negative distances in turns, just set to positive
 						data.linear *= -1;

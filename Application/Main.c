@@ -39,7 +39,7 @@
 // #include "../c_lib/Task_Scheduler.h"
 
 #define DEBUG		1
-#define CNTRL_SYS	1
+#define CNTRL_SYS	0
 #define KP_L		0.1875335
 #define KP_R		0.1728258
 
