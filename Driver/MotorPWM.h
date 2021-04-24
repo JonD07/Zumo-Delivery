@@ -57,6 +57,7 @@
 #include <ctype.h>         // For int32_t type
 #include <stdbool.h>       // For bool
 
+#define PI		3.14159
 
 /**
  * Function MotorPWM_Init initializes the motor PWM on Timer 1 for PWM based voltage control of the motors.
@@ -124,5 +125,6 @@ float DutyCycle_to_Velocity_Left(int duty_cycle);
 float DutyCycle_to_Velocity_Right(int duty_cycle);
 int Velocity_to_DutyCycle_Left(float velocity);
 int Velocity_to_DutyCycle_Right(float velocity);
+float ECount_to_Distance(int encoder_count);
 
 #endif

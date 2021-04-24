@@ -516,7 +516,7 @@ void Message_Handling_Task()
 				if((data.angular < 0.01) && (data.angular > -0.01)) {
 					if(1) {
 						char out_put[] = {'G','o',' ','S','t','r'};
-						usb_send_msg("cccccc", command, &out_put, sizeof(out_put));
+						usb_send_msg("ccccccc", command, &out_put, sizeof(out_put));
 					}
 					// Drive straight
 					// Assign linear position

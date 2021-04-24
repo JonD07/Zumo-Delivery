@@ -168,3 +168,7 @@ int Velocity_to_DutyCycle_Left(float velocity) {
 int Velocity_to_DutyCycle_Right(float velocity) {
 	return (int)((velocity - 0.0133)/0.0034);
 }
+
+float ECount_to_Distance(int encoder_count) {
+	return ((float)encoder_count * 2 * PI * 0.0195) / (12 * 75.81);
+}

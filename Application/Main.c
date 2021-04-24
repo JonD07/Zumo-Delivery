@@ -63,11 +63,11 @@ int main(void)
 	float bat_val = 0;
 
 	//Motor Control Values
-	int32_t ticksL_old;
-	int32_t ticksR_old;
+	float ticksL_old;
+	float ticksR_old;
 	float time_old;
-	int32_t ticksL_new;
-	int32_t ticksR_new;
+	float ticksL_new;
+	float ticksR_new;
 	float time_new;
 	bool first_time = true;
 
@@ -319,8 +319,8 @@ int main(void)
 			else {
 				ticksL_new = Counts_Left();
 				ticksR_new = Counts_Right();
-				float measured_left = (((float)(ticksL_new - ticksL_old)) * 2 * 0.0195 / (12 * 75.81));
-				float measured_right = (((float)(ticksR_new - ticksR_old)) * 2 * 0.0195 / (12 * 75.81));
+				float measured_left = ECount_to_Distance(ticksL_new - ticksL_old);
+				float measured_right = ECount_to_Distance(ticksR_new - ticksR_old);
 
 				// Determine if we are done moving
 				bool doneL = (ctr_LeftMotor.target_pos > 0) ?
