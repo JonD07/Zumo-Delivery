@@ -48,7 +48,7 @@
 #define HALF_WHEEL_BASE	0.049
 #define TURN_VELOCITY	0.1
 #define MIN_TURN_ARC	0.04
-#define SPIN_DUTYCYLE	20
+#define SPIN_DUTYCYLE	25
 
 /** Message Driven State Machine Flags */
 typedef struct MSG_FLAG { bool active; float duration; Time_t last_trigger_time; } MSG_FLAG_t;
