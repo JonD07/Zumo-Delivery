@@ -57,7 +57,7 @@
 #include <ctype.h>         // For int32_t type
 #include <stdbool.h>       // For bool
 
-#define PI		3.14159
+#include "driver_defines.h"
 
 /**
  * Function MotorPWM_Init initializes the motor PWM on Timer 1 for PWM based voltage control of the motors.

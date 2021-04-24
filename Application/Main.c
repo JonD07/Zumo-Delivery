@@ -28,15 +28,8 @@
 
 */
 
-#include "../Driver/SerialIO.h"
-#include "../Driver/MEGN540_MessageHandeling.h"
-#include "../Driver/Timing.h"
-#include "../Driver/Encoder.h"
-#include "../Driver/MotorPWM.h"
-#include "../Driver/Filter.h"
-#include "../Driver/Battery_Monitor.h"
-#include "../Driver/Controller.h"
-// #include "../c_lib/Task_Scheduler.h"
+#include "../Driver/include_driver.h"
+#include "MEGN540_MessageHandeling.h"
 
 #define DEBUG		1
 #define CNTRL_SYS	0
