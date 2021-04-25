@@ -152,3 +152,23 @@ void Set_MAX_Motor_PWM( uint16_t MAX_PWM )
 	// Enable interrupts
 	sei();
 }
+
+float DutyCycle_to_Velocity_Left(int duty_cycle) {
+	return ((float)duty_cycle * 0.0033) + 0.0133;
+}
+
+float DutyCycle_to_Velocity_Right(int duty_cycle) {
+	return ((float)duty_cycle * 0.0034) + 0.0133;
+}
+
+int Velocity_to_DutyCycle_Left(float velocity) {
+	return (int)((velocity - 0.0133)/0.0033);
+}
+
+int Velocity_to_DutyCycle_Right(float velocity) {
+	return (int)((velocity - 0.0133)/0.0034);
+}
+
+float ECount_to_Distance(int encoder_count) {
+	return ((float)encoder_count * 2 * PI * 0.0195) / (12 * 75.81);
+}

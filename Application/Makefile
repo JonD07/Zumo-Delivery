@@ -25,7 +25,7 @@ TARGET       = Main
 SRC = $(TARGET).c       \
 	$(MEGN_DRIVER_PATH)/SerialIO.c			\
 	$(MEGN_DRIVER_PATH)/Ring_Buffer.c		\
-	$(MEGN_DRIVER_PATH)/MEGN540_MessageHandeling.c \
+	$(APP_PATH)/MEGN540_MessageHandeling.c \
 	$(MEGN_DRIVER_PATH)/Timing.c				\
 	${MEGN_DRIVER_PATH}/Encoder.c \
 	${MEGN_DRIVER_PATH}/MotorPWM.c\
@@ -42,12 +42,13 @@ CPPSRC =
 LUFA_DIR     = ../lufa
 LUFA_PATH    = $(LUFA_DIR)/LUFA
 MEGN_DRIVER_PATH = ../Driver
+APP_PATH = ../Application
 
 # List any extra directories to look for include files here.
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = $(LUFA_DIR) $(MEGN_DRIVER_PATH) $(MEGN_DRIVER_PATH)/USB_Config
+EXTRAINCDIRS = $(LUFA_DIR) $(MEGN_DRIVER_PATH) $(APP_PATH) $(MEGN_DRIVER_PATH)/USB_Config
 
 #  Micro-Controller and USB Information
 MCU          = atmega32u4

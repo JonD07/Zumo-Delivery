@@ -57,6 +57,7 @@
 #include <ctype.h>         // For int32_t type
 #include <stdbool.h>       // For bool
 
+#include "driver_defines.h"
 
 /**
  * Function MotorPWM_Init initializes the motor PWM on Timer 1 for PWM based voltage control of the motors.
@@ -116,5 +117,14 @@ uint16_t Get_MAX_Motor_PWM();
  * atmega32U4 datasheat.
  */
 void Set_MAX_Motor_PWM( uint16_t MAX_PWM );
+
+/*
+ * Helper functions to convert between velocities and duty cycles
+ */
+float DutyCycle_to_Velocity_Left(int duty_cycle);
+float DutyCycle_to_Velocity_Right(int duty_cycle);
+int Velocity_to_DutyCycle_Left(float velocity);
+int Velocity_to_DutyCycle_Right(float velocity);
+float ECount_to_Distance(int encoder_count);
 
 #endif

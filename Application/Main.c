@@ -28,18 +28,11 @@
 
 */
 
-#include "../Driver/SerialIO.h"
-#include "../Driver/MEGN540_MessageHandeling.h"
-#include "../Driver/Timing.h"
-#include "../Driver/Encoder.h"
-#include "../Driver/MotorPWM.h"
-#include "../Driver/Filter.h"
-#include "../Driver/Battery_Monitor.h"
-#include "../Driver/Controller.h"
-// #include "../c_lib/Task_Scheduler.h"
+#include "../Driver/include_driver.h"
+#include "MEGN540_MessageHandeling.h"
 
-#define DEBUG		0
-#define CNTRL_SYS	1
+#define DEBUG		1
+#define CNTRL_SYS	0
 #define KP_L		0.1875335
 #define KP_R		0.1728258
 
@@ -63,11 +56,11 @@ int main(void)
 	float bat_val = 0;
 
 	//Motor Control Values
-	int32_t ticksL_old;
-	int32_t ticksR_old;
+	float ticksL_old;
+	float ticksR_old;
 	float time_old;
-	int32_t ticksL_new;
-	int32_t ticksR_new;
+	float ticksL_new;
+	float ticksR_new;
 	float time_new;
 	bool first_time = true;
 
@@ -319,8 +312,8 @@ int main(void)
 			else {
 				ticksL_new = Counts_Left();
 				ticksR_new = Counts_Right();
-				float measured_left = (((float)(ticksL_new - ticksL_old)) * 2 * 0.0195 / (12 * 75.81));
-				float measured_right = (((float)(ticksR_new - ticksR_old)) * 2 * 0.0195 / (12 * 75.81));
+				float measured_left = ECount_to_Distance(ticksL_new - ticksL_old);
+				float measured_right = ECount_to_Distance(ticksR_new - ticksR_old);
 
 				// Determine if we are done moving
 				bool doneL = (ctr_LeftMotor.target_pos > 0) ?
@@ -348,25 +341,32 @@ int main(void)
 				}
 				else
 				{
-					// Update controller
-					time_new = GetTimeSec();
-					Controller_Set_Target_Position(&ctr_LeftMotor, ctr_LeftMotor.target_pos - measured_left);
-					Controller_Set_Target_Position(&ctr_RightMotor, ctr_RightMotor.target_pos - measured_right);
-
 					int16_t pwmL = 0;
 					int16_t pwmR = 0;
+					time_new = GetTimeSec();
+					float dt = time_new - time_old;
+
+					// Update target position
+					Controller_Set_Target_Position(&ctr_LeftMotor,
+							(ctr_LeftMotor.target_pos - measured_left));
+					Controller_Set_Target_Position(&ctr_RightMotor,
+							(ctr_RightMotor.target_pos - measured_right));
 
 					if(CNTRL_SYS) {
-						float new_speedR = Controller_Update(&ctr_RightMotor, measured_right, (time_new - time_old));
-						float new_speedL = Controller_Update(&ctr_LeftMotor, measured_left, (time_new - time_old));
+						/// Update controller
+						// Correct to keep measurement positive in controller
+						float mL = (measured_left < 0) ? (-1*measured_left) : measured_left;
+						float mR = (measured_right < 0) ? (-1*measured_right) : measured_right;
+						float new_speedL = Controller_Update(&ctr_LeftMotor, mL, dt);
+						float new_speedR = Controller_Update(&ctr_RightMotor, mR, dt);
 						// Determine new PWM with sign for direction
-						pwmL =  (int16_t)((new_speedL - 0.0133) / 0.0033);
-						pwmR =  (int16_t)((new_speedR - 0.0133) / 0.0034);
+						pwmL = Velocity_to_DutyCycle_Left(new_speedL);
+						pwmR =  Velocity_to_DutyCycle_Right(new_speedR);
 					}
 					else {
 						// Just use given velocity
-						pwmL =  (int16_t)((ctr_LeftMotor.target_vel - 0.0133) / 0.0033);
-						pwmR =  (int16_t)((ctr_RightMotor.target_vel - 0.0133) / 0.0034);
+						pwmL = Velocity_to_DutyCycle_Left(ctr_LeftMotor.target_vel);
+						pwmR =  Velocity_to_DutyCycle_Right(ctr_RightMotor.target_vel);
 					}
 
 					pwmL = (ctr_LeftMotor.target_pos > 0) ? pwmL : -1 * pwmL;
@@ -416,49 +416,55 @@ int main(void)
 				time_new = GetTimeSec();
 				int16_t pwmL = 0;
 				int16_t pwmR = 0;
+				// Determine distance traveled
+				ticksL_new = Counts_Left();
+				ticksR_new = Counts_Right();
+				float measured_left = ECount_to_Distance(ticksL_new - ticksL_old);
+				float measured_right = ECount_to_Distance(ticksR_new - ticksR_old);
 
 				if(ctr_LeftMotor.target_vel < 0) {
 					// Go backwards
-					// Determine distance traveled
-					ticksL_new = Counts_Left();
-					ticksR_new = Counts_Right();
-
 					if(CNTRL_SYS) {
+						// Correct to keep measurement positive in controller
+						float mL = (measured_left < 0) ? (-1*measured_left) : measured_left;
+						float mR = (measured_right < 0) ? (-1*measured_right) : measured_right;
 						// Correct direction for controller
 						ctr_RightMotor.target_vel = -1*ctr_RightMotor.target_vel;
 						ctr_LeftMotor.target_vel = -1*ctr_LeftMotor.target_vel;
-						float new_speedR = Controller_Update(&ctr_RightMotor, ((ticksR_old - ticksR_new) * 2 * 0.0195 / (12 * 75.81)), (time_new - time_old));
-						float new_speedL = Controller_Update(&ctr_LeftMotor, ((ticksL_old - ticksL_new) * 2 * 0.0195 / (12 * 75.81)), (time_new - time_old));
+						// Update controller
+						float new_speedL = Controller_Update(&ctr_LeftMotor, mL, (time_new - time_old));
+						float new_speedR = Controller_Update(&ctr_RightMotor, mR, (time_new - time_old));
 						// Determine new PWM with sign for direction
-						pwmL =  -1*(int16_t)((new_speedL - 0.0133) / 0.0033);
-						pwmR =  -1*(int16_t)((new_speedR - 0.0133) / 0.0034);
+						pwmL = -1 * Velocity_to_DutyCycle_Left(new_speedL);
+						pwmR = -1 * Velocity_to_DutyCycle_Right(new_speedR);
 						// Correct direction for controller
 						ctr_RightMotor.target_vel = -1*ctr_RightMotor.target_vel;
 						ctr_LeftMotor.target_vel = -1*ctr_LeftMotor.target_vel;
 					}
 					else {
 						// Just use given velocity
-						pwmL =  (int16_t)((ctr_LeftMotor.target_vel - 0.0133) / 0.0033);
-						pwmR =  (int16_t)((ctr_RightMotor.target_vel - 0.0133) / 0.0034);
+						pwmL = Velocity_to_DutyCycle_Left(ctr_LeftMotor.target_vel);
+						pwmR = Velocity_to_DutyCycle_Right(ctr_RightMotor.target_vel);
 					}
 				}
 				else {
 					// Go forwards
-					// Determine distance traveled
-					ticksL_new = Counts_Left();
-					ticksR_new = Counts_Right();
 
 					if(CNTRL_SYS) {
-						float new_speedR = Controller_Update(&ctr_RightMotor, ((ticksR_new - ticksR_old) * 2 * 0.0195 / (12 * 75.81)), (time_new - time_old));
-						float new_speedL = Controller_Update(&ctr_LeftMotor, ((ticksL_new - ticksL_old) * 2 * 0.0195 / (12 * 75.81)), (time_new - time_old));
+						// Correct to keep measurement positive in controller
+						float mL = (measured_left < 0) ? (-1*measured_left) : measured_left;
+						float mR = (measured_right < 0) ? (-1*measured_right) : measured_right;
+						// Update controller
+						float new_speedL = Controller_Update(&ctr_LeftMotor, mL, (time_new - time_old));
+						float new_speedR = Controller_Update(&ctr_RightMotor, mR, (time_new - time_old));
 						// Determine new PWM with sign for direction
-						pwmL =  (int16_t)((new_speedL - 0.0133) / 0.0033);
-						pwmR =  (int16_t)((new_speedR - 0.0133) / 0.0034);
+						pwmL = Velocity_to_DutyCycle_Left(new_speedL);
+						pwmR = Velocity_to_DutyCycle_Right(new_speedR);
 					}
 					else {
 						// Just use given velocity
-						pwmL =  (int16_t)((ctr_LeftMotor.target_vel - 0.0133) / 0.0033);
-						pwmR =  (int16_t)((ctr_RightMotor.target_vel - 0.0133) / 0.0034);
+						pwmL = Velocity_to_DutyCycle_Left(ctr_LeftMotor.target_vel);
+						pwmR = Velocity_to_DutyCycle_Right(ctr_RightMotor.target_vel);
 					}
 				}
 
