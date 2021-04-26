@@ -536,14 +536,14 @@ int main(void)
 			IRRead();
 			int16_t prox_out = IR_Counts();
 
-			if(mf_sys_data.duration <= 0)
+			if(mf_ir_proximity.duration <= 0)
 			{
-				mf_sys_data.active = false;
+				mf_ir_proximity.active = false;
 				usb_send_msg( "ch", 'i', &prox_out, sizeof(prox_out) );
 			}
 			else
 			{
-				mf_sys_data.last_trigger_time = GetTime();
+				mf_ir_proximity.last_trigger_time = GetTime();
 				usb_send_msg( "ch", 'I', &prox_out, sizeof(prox_out) );
 			}
 		}
