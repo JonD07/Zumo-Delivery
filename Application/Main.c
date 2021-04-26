@@ -43,8 +43,35 @@ float den_right[] = {1.000000000000,	-1.000000000000};
 
 void InitializeSystem()
 {
+	/*
+	 * Initialize hardware
+	 */
+	// Initialize timer zero functionality
+	SetupTimer0();
+	// Initialize encoders
+	Encoders_Init();
+	// Initialize battery monitor
+	Battery_Monitor_Init();
+	// Initialize PMW
+	Motor_PWM_Init(0x190); // 400 => 20 kHz
+	// Initialize IR proximity sensor
+	Proxy_Init();
+	// Initialize USB
+	USB_SetupHardware();
 
-    
+	/*
+	 * Initialize application features
+	 */
+	// Initialize the left and right motor controller
+	Controller_Init(&ctr_LeftMotor, KP_L, num_left, den_left, 1, 10); // 10ms => 100 Hz
+	Controller_Init(&ctr_RightMotor, KP_R, num_right, den_right, 1, 10); // 10ms => 100 Hz
+	// Initialize message handling
+	Message_Handling_Init();
+
+	/*
+	 * Enable Global Interrupts for USB and Timer etc.
+	 */
+	GlobalInterruptEnable();
 }
 
 /** Main program entry point. This routine configures the hardware required by the application, then
@@ -64,23 +91,8 @@ int main(void)
 	float time_new;
 	bool first_time = true;
 
-	// Initialize timer zero functionality
-	SetupTimer0();
-	// Initialize encoders
-	Encoders_Init();
-	// Initialize battery monitor
-	Battery_Monitor_Init();
-	// Initialize PMW
-	Motor_PWM_Init(0x190); // 400 => 20 kHz
-	// Initialize the left and right motor controller
-	Controller_Init(&ctr_LeftMotor, KP_L, num_left, den_left, 1, 10); // 10ms => 100 Hz
-	Controller_Init(&ctr_RightMotor, KP_R, num_right, den_right, 1, 10); // 10ms => 100 Hz
-	// Initialize USB
-	USB_SetupHardware();
-	// Initialize message handling
-	Message_Handling_Init();
-	// Enable Global Interrupts for USB and Timer etc.
-	GlobalInterruptEnable();
+	// Initialize hardware and various features
+	InitializeSystem();
 
 	// Init batter task flag
 	mf_battery_task.duration = 2;

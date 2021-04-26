@@ -134,6 +134,31 @@ Time_t SecondsSince(const Time_t* time_start_p )
 	return delta_time;
 }
 
+/*
+ * This function runs a delay in microseconds. The logic for this function
+ * is based off of wiring.c in the open-source Arduino-core library.
+ *
+ * AVOID USING THIS FOR LONG PERIOD OF TIME!!!
+ */
+void DelayMicroseconds(uint16_t us) {
+	// Don't waste your time for 1 us. Function overhead is long enough
+	// to last 1 us
+	if (us <= 1) return;
+
+	// The loop below takes 1/4 of a microsecond per iteration, so
+	// quadruple the count.
+	us <<= 2;
+
+	// We have already wasted roughly 5 us (including this subtraction)...
+	us -= 5;
+
+	// Assembly busy-wait!
+	__asm__ __volatile__ (
+		"1: sbiw %0,1" "\n\t"				// 2 cycles
+		"brne 1b" : "=w" (us) : "0" (us)	// 2 cycles
+	);
+}
+
 /**
  * Interrupt Service Routine for the Timer0 Compare A feature.
  */
