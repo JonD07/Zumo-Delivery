@@ -528,6 +528,25 @@ int main(void)
 			mf_motor_vel_control.active = false;
 			mf_timed_pwm.active = false;
 		}
+
+		// Handle IR proximity flag
+		if(MSG_FLAG_Execute(&mf_ir_proximity))
+		{
+			// Run distance sensor
+			IRRead();
+			int16_t prox_out = IR_Counts();
+
+			if(mf_sys_data.duration <= 0)
+			{
+				mf_sys_data.active = false;
+				usb_send_msg( "ch", 'i', &prox_out, sizeof(prox_out) );
+			}
+			else
+			{
+				mf_sys_data.last_trigger_time = GetTime();
+				usb_send_msg( "ch", 'I', &prox_out, sizeof(prox_out) );
+			}
+		}
 	}
 }
 

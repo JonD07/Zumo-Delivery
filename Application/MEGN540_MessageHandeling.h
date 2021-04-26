@@ -62,6 +62,7 @@ MSG_FLAG_t mf_sys_data;			///<-- Used to send periodic system status data
 MSG_FLAG_t mf_motor_dist_control;	///<-- Enables motor controllers for distance
 MSG_FLAG_t mf_motor_vel_control;	///<-- Enables motor controllers for velocity
 MSG_FLAG_t mf_motor_stop;		///<-- Used to set PWM and control position & velocity to zero
+MSG_FLAG_t mf_ir_proximity;		///<-- Used for IR proximity sensor
 
 /**
  * Function MSG_FLAG_Execute indicates if the action associated with the message flag should be executed
