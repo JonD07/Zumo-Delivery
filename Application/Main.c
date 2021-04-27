@@ -51,7 +51,7 @@ void InitializeSystem()
 	// Initialize encoders
 //	Encoders_Init();
 	// Initialize battery monitor
-//	Battery_Monitor_Init();
+	Battery_Monitor_Init();
 	// Initialize PMW
 	Motor_PWM_Init(0x190); // 400 => 20 kHz
 	// Initialize IR proximity sensor
@@ -95,8 +95,8 @@ int main(void)
 	InitializeSystem();
 
 	// Init batter task flag
-//	mf_battery_task.duration = 2;
-//	mf_battery_task.active = true;
+	mf_battery_task.duration = 2;
+	mf_battery_task.active = true;
 
 	while(true)
 	{
