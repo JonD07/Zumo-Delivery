@@ -58,6 +58,7 @@ void IRRead() {
 	cli();
 	// Set input with pullup
 	DDRF &= ~(0x01);
+	PINF |= 0x01;
 	PORTF |= 0x01;
 	// Ensure line sensor lights are off
 	PORTB &= ~(0x80);
@@ -71,14 +72,12 @@ void IRRead() {
 	m_tFrontIRSensor.m_CountRightLED = 0;
 
 	for(int i = 0; i < numLevels; i++) {
-		PORTF |= 0x01;
-		PINF |= 0x01;
 		// Start the IR strobe and wait
 		start_strobe(false, levelsArray[i]);
 		// Give sensor some time before checking input
 		DelayMicroseconds(pulseOnTimeUs);
 		// Record result. If the pin is low, then we have a hit at this brightness
-		if(!(PINF & 0x01)) {
+		if(!bit_is_set(PINF, 1)) {
 			m_tFrontIRSensor.m_CountLeftLED++;
 		}
 		// Shut-off strobe
@@ -92,7 +91,7 @@ void IRRead() {
 		// Give sensor some time before checking input
 		DelayMicroseconds(pulseOnTimeUs);
 		// Record result. If the pin is low, then we have a hit at this brightness
-		if(!(PINF & 0x01)) {
+		if(!bit_is_set(PINF, 1)) {
 			m_tFrontIRSensor.m_CountRightLED++;
 		}
 		// Shut-off strobe
