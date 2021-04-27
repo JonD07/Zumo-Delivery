@@ -37,9 +37,10 @@ static const uint16_t pulseOffTimeUs = 578;
 static IRSensorData m_tFrontIRSensor;
 
 // Brightness levels
-static uint16_t levelsArray[] = { 4, 15, 32, 55, 85, 120 };
+//static uint16_t levelsArray[] = { 4, 15, 32, 55, 85, 120 };
+static uint16_t levelsArray[] = { 85, 120 };
 // This needs to reflect the size of the above array!
-static uint8_t numLevels = 6;
+static uint8_t numLevels = 2;
 
 
 /*
