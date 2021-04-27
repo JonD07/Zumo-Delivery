@@ -25,8 +25,7 @@
 /*
  * Static variables
  */
-// Hardware related variables
-static const uint8_t irEmitPin = 11;
+/// Hardware related variables
 // This gives the strobe a period of 38 kHz
 static const uint16_t stobe_period = 420;
 // The sensor docs recommend waiting 7 - 15 cycles. Wait 16/(38 kHz) = 421 us
@@ -34,7 +33,7 @@ static const uint16_t pulseOnTimeUs = 421;
 // Need to wait 6 cycles to read after turning on. 22/(38 kHz) = 578 us
 static const uint16_t pulseOffTimeUs = 578;
 
-static IRSensorData m_tFrontIRSensor;
+static uint16_t m_nLEDProxyCount;
 
 // Brightness levels
 //static uint16_t levelsArray[] = { 4, 15, 32, 55, 85, 120 };
@@ -47,7 +46,7 @@ static uint8_t numLevels = 2;
  * Initializes the front facing IR proximity sensor
  */
 void Proxy_Init() {
-	// Nothing to really do at this point...
+	m_nLEDProxyCount = 0;
 }
 
 /*
@@ -70,10 +69,7 @@ void IRRead(eProximitySize side) {
 
 	// Reset the IR readings
 	if(side == LEFT) {
-		m_tFrontIRSensor.m_CountLeftLED = 0;
-	}
-	else if(side == RIGHT) {
-		m_tFrontIRSensor.m_CountRightLED = 0;
+		m_nLEDProxyCount = 0;
 	}
 
 	for(int i = 0; i < numLevels; i++) {
@@ -83,7 +79,7 @@ void IRRead(eProximitySize side) {
 		DelayMicroseconds(pulseOnTimeUs);
 		// Record result. If the pin is low, then we have a hit at this brightness
 		if(!bit_is_set(PINF, 1)) {
-			m_tFrontIRSensor.m_CountLeftLED++;
+			m_nLEDProxyCount++;
 		}
 		// Shut-off strobe
 		stop_strobe();
@@ -96,12 +92,7 @@ void IRRead(eProximitySize side) {
  * Returns max( left-LED-counts, right-LED-counts)
  */
 uint16_t IR_Counts() {
-	if(m_tFrontIRSensor.m_CountLeftLED >= m_tFrontIRSensor.m_CountRightLED) {
-		return m_tFrontIRSensor.m_CountLeftLED;
-	}
-	else {
-		return m_tFrontIRSensor.m_CountRightLED;
-	}
+	return m_nLEDProxyCount;
 }
 
 /*

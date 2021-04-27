@@ -43,16 +43,15 @@
 #include "Timing.h"
 #include "driver_defines.h"
 
-typedef struct IRSensorData
-{
-	uint8_t m_CountLeftLED;
-	uint8_t m_CountRightLED;
-} IRSensorData;
-
 /*
  * Initializes the front facing IR proximity sensor
  */
 void Proxy_Init();
+
+/*
+ * Initializes the front facing IR proximity sensor
+ */
+void Proxy_Reset();
 
 /*
  * Runs the IR read logic
