@@ -56,9 +56,15 @@ void IRRead() {
 	// Set read pin
 	uint8_t oldSREG = SREG;
 	cli();
+	// Set input with pullup
 	DDRF &= ~(0x01);
 	PORTF |= 0x01;
+	// Ensure line sensor lights are off
+	PORTB &= ~(0x80);
+	DDRB &= ~(0x80);
 	SREG = oldSREG;
+	// Wait before continuing
+	DelayMicroseconds(pulseOffTimeUs);
 
 	// Reset the IR readings
 	m_tFrontIRSensor.m_CountLeftLED = 0;
@@ -76,7 +82,7 @@ void IRRead() {
 		// Shut-off strobe
 		stop_strobe();
 		// Wait before continuing to next strobe
-		DelayMicroseconds(pulseOnTimeUs);
+		DelayMicroseconds(pulseOffTimeUs);
 
 		/// Now run the right side
 		// Start the IR strobe and wait
@@ -90,7 +96,7 @@ void IRRead() {
 		// Shut-off strobe
 		stop_strobe();
 		// Wait before continuing to next strobe
-		DelayMicroseconds(pulseOnTimeUs);
+		DelayMicroseconds(pulseOffTimeUs);
 	}
 }
 
@@ -116,32 +122,32 @@ void start_strobe(bool strobe_right, uint16_t brightness) {
 
 	// Set the PWM pin to be an input temporarily. This is needed
 	// to avoid errors on the output.
-	PORTC &= ~(0x40);
-	DDRC &= ~(0x40);
+	PORTC &= ~(1 << 6);
+	DDRC &= ~(1 << 6);
 
 	// COM3A<1:0> = 10 : Clear OC3A on match, set at top.
-	TCCR3A = 0x80;
+	TCCR3A = (1 << COM3A1);
 	TCCR3B = 0;
 
 	// Drive OC3A signal low by simulating a match
-	TCCR3C = 0x80;
+	TCCR3C = (1 << FOC3A);
 
 	// Make the PWM pin be an output. OC03A will control its value.
-	DDRC |= 0x40;
+	DDRC |= (1 << 6);
 
 	if(strobe_right)
 	{
 		// Set PORTF6
-		PORTF |= 0x40;
+		PORTF |= (1 << 6);
 	}
 	else
 	{
 		// Clear PORTF6
-		PORTF &= ~(0x40);
+		PORTF &= ~(1 << 6);
 	}
 
 	// Set PORTF6 as an output
-	DDRF |= 0x40;
+	DDRF |= (1 << 6);
 
 	// Set frequency for compare 3
 	ICR3 = stobe_period;
@@ -167,8 +173,8 @@ void start_strobe(bool strobe_right, uint16_t brightness) {
 void stop_strobe()
 {
 	// Drive PWM pin low. This avoids letting the pin float
-	PORTC &= ~(0x40);
-	DDRC |= 0x40;
+	PORTC &= ~(1 << 6);
+	DDRC |= (1 << 6);
 
 	// Disconnect PWM and drive output low
 	TCCR3A = (1 << WGM31);
