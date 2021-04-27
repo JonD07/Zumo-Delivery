@@ -71,6 +71,8 @@ void IRRead() {
 	m_tFrontIRSensor.m_CountRightLED = 0;
 
 	for(int i = 0; i < numLevels; i++) {
+		PORTF |= 0x01;
+		PINF |= 0x01;
 		// Start the IR strobe and wait
 		start_strobe(false, levelsArray[i]);
 		// Give sensor some time before checking input
