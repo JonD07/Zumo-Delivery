@@ -1013,7 +1013,7 @@ void Message_Handling_Task()
 		break;
 
 	case 'I':	// Send IR distances
-		if( usb_msg_length() >= MEGN540_Message_Len('i') )
+		if( usb_msg_length() >= MEGN540_Message_Len('I') )
 		{
 			// Remove first byte
 			usb_msg_get();

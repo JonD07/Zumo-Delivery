@@ -98,7 +98,7 @@ void IRRead() {
  * Returns max( left-LED-counts, right-LED-counts)
  */
 uint16_t IR_Counts() {
-	if(m_tFrontIRSensor.m_CountLeftLED > m_tFrontIRSensor.m_CountRightLED) {
+	if(m_tFrontIRSensor.m_CountLeftLED >= m_tFrontIRSensor.m_CountRightLED) {
 		return m_tFrontIRSensor.m_CountLeftLED;
 	}
 	else {
