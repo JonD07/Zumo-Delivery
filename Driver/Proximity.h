@@ -41,6 +41,7 @@
 #include <stdbool.h>
 
 #include "Timing.h"
+#include "driver_defines.h"
 
 typedef struct IRSensorData
 {
@@ -56,7 +57,7 @@ void Proxy_Init();
 /*
  * Runs the IR read logic
  */
-void IRRead();
+void IRRead(eProximitySize side);
 
 /*
  * Returns max( left-LED-counts, right-LED-counts)
@@ -68,7 +69,7 @@ uint16_t IR_Counts();
  * brightness level and set period. The logic for this function
  * is based off of wiring.c in the open-source Arduino-core library.
  */
-void start_strobe(bool strobe_right, uint16_t brightness);
+void start_strobe(eProximitySize side, uint16_t brightness);
 
 /*
  * This function stops the IR LED strobe. The logic for this function

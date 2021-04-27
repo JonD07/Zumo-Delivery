@@ -90,6 +90,7 @@ int main(void)
 	float ticksR_new;
 	float time_new;
 	bool first_time = true;
+	bool proxy_first = true;
 
 	// Initialize hardware and various features
 	InitializeSystem();
@@ -532,19 +533,28 @@ int main(void)
 		// Handle IR proximity flag
 		if(MSG_FLAG_Execute(&mf_ir_proximity))
 		{
-			// Run distance sensor
-			IRRead();
-			int16_t prox_out = IR_Counts();
-
-			if(mf_ir_proximity.duration <= 0)
-			{
-				mf_ir_proximity.active = false;
-				usb_send_msg( "ch", 'i', &prox_out, sizeof(prox_out) );
+			if(proxy_first) {
+				// Run just one side of the sensor
+				IRRead(LEFT);
+				proxy_first = false;
 			}
-			else
-			{
-				mf_ir_proximity.last_trigger_time = GetTime();
-				usb_send_msg( "ch", 'I', &prox_out, sizeof(prox_out) );
+			else {
+				// Run right side of distance sensor
+				IRRead(RIGHT);
+				// Read distance data and return
+				int16_t prox_out = IR_Counts();
+				// Return data to user
+				if(mf_ir_proximity.duration <= 0)
+				{
+					mf_ir_proximity.active = false;
+					usb_send_msg( "ch", 'i', &prox_out, sizeof(prox_out) );
+				}
+				else
+				{
+					mf_ir_proximity.last_trigger_time = GetTime();
+					usb_send_msg( "ch", 'I', &prox_out, sizeof(prox_out) );
+				}
+				proxy_first = true;
 			}
 		}
 	}

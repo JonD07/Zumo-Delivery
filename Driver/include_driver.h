@@ -5,6 +5,7 @@
 
 #include "Battery_Monitor.h"
 #include "Controller.h"
+#include "driver_defines.h"
 #include "Encoder.h"
 #include "Filter.h"
 #include "MotorPWM.h"

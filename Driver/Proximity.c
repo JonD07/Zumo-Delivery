@@ -53,7 +53,7 @@ void Proxy_Init() {
 /*
  * Runs the IR read logic
  */
-void IRRead() {
+void IRRead(eProximitySize side) {
 	// Set read pin
 	uint8_t oldSREG = SREG;
 	cli();
@@ -69,31 +69,21 @@ void IRRead() {
 	DelayMicroseconds(pulseOffTimeUs);
 
 	// Reset the IR readings
-	m_tFrontIRSensor.m_CountLeftLED = 0;
-	m_tFrontIRSensor.m_CountRightLED = 0;
+	if(side == LEFT) {
+		m_tFrontIRSensor.m_CountLeftLED = 0;
+	}
+	else if(side == RIGHT) {
+		m_tFrontIRSensor.m_CountRightLED = 0;
+	}
 
 	for(int i = 0; i < numLevels; i++) {
 		// Start the IR strobe and wait
-		start_strobe(false, levelsArray[i]);
+		start_strobe(side, levelsArray[i]);
 		// Give sensor some time before checking input
 		DelayMicroseconds(pulseOnTimeUs);
 		// Record result. If the pin is low, then we have a hit at this brightness
 		if(!bit_is_set(PINF, 1)) {
 			m_tFrontIRSensor.m_CountLeftLED++;
-		}
-		// Shut-off strobe
-		stop_strobe();
-		// Wait before continuing to next strobe
-		DelayMicroseconds(pulseOffTimeUs);
-
-		/// Now run the right side
-		// Start the IR strobe and wait
-		start_strobe(true, levelsArray[i]);
-		// Give sensor some time before checking input
-		DelayMicroseconds(pulseOnTimeUs);
-		// Record result. If the pin is low, then we have a hit at this brightness
-		if(!bit_is_set(PINF, 1)) {
-			m_tFrontIRSensor.m_CountRightLED++;
 		}
 		// Shut-off strobe
 		stop_strobe();
@@ -118,7 +108,7 @@ uint16_t IR_Counts() {
  * This function starts the IR LED strobe based on the given
  * brightness level and set period.
  */
-void start_strobe(bool strobe_right, uint16_t brightness) {
+void start_strobe(eProximitySize side, uint16_t brightness) {
 	// Disable Timer 3's interrupts.
 	TIMSK3 = 0;
 
@@ -137,13 +127,11 @@ void start_strobe(bool strobe_right, uint16_t brightness) {
 	// Make the PWM pin be an output. OC03A will control its value.
 	DDRC |= (1 << 6);
 
-	if(strobe_right)
-	{
+	if(side == LEFT) {
 		// Set PORTF6
 		PORTF |= (1 << 6);
 	}
-	else
-	{
+	else if(side == RIGHT) {
 		// Clear PORTF6
 		PORTF &= ~(1 << 6);
 	}
