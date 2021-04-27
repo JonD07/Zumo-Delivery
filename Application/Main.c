@@ -49,7 +49,7 @@ void InitializeSystem()
 	// Initialize timer zero functionality
 	SetupTimer0();
 	// Initialize encoders
-//	Encoders_Init();
+	Encoders_Init();
 	// Initialize battery monitor
 	Battery_Monitor_Init();
 	// Initialize PMW
@@ -223,20 +223,20 @@ int main(void)
 		// Process encoder count command
 		if(MSG_FLAG_Execute(&mf_send_encoder))
 		{
-//			struct __attribute__((__packed__)) { float left_enc; float right_enc; } ret_val;
-//			ret_val.left_enc = Counts_Left();
-//			ret_val.right_enc = Counts_Right();
-//
-//			if(mf_send_encoder.duration <= 0)
-//			{
+			struct __attribute__((__packed__)) { float left_enc; float right_enc; } ret_val;
+			ret_val.left_enc = Counts_Left();
+			ret_val.right_enc = Counts_Right();
+
+			if(mf_send_encoder.duration <= 0)
+			{
 				mf_send_encoder.active = false;
-//				usb_send_msg("cff", 'e', &ret_val, sizeof(ret_val));
-//			}
-//			else
-//			{
-//				mf_send_encoder.last_trigger_time = GetTime();
-//				usb_send_msg("cff", 'E', &ret_val, sizeof(ret_val));
-//			}
+				usb_send_msg("cff", 'e', &ret_val, sizeof(ret_val));
+			}
+			else
+			{
+				mf_send_encoder.last_trigger_time = GetTime();
+				usb_send_msg("cff", 'E', &ret_val, sizeof(ret_val));
+			}
 		}
 
 		// Process battery monitor command
