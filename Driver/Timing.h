@@ -93,4 +93,12 @@ float  GetTimeSec();
  */
 Time_t SecondsSince(const Time_t* time_start_p );
 
+/*
+ * This function runs a delay in microseconds. The logic for this function
+ * is based off of wiring.c in the open-source Arduino-core library.
+ *
+ * AVOID USING THIS FOR LONG PERIOD OF TIME!!!
+ */
+void DelayMicroseconds(uint16_t);
+
 #endif //LAB2_TIMING_TIMING_H

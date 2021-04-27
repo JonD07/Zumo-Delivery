@@ -80,6 +80,7 @@ void Message_Handling_Init()
 	MSG_FLAG_Init( &mf_sys_data );
 	MSG_FLAG_Init( &mf_motor_dist_control );
 	MSG_FLAG_Init( &mf_motor_stop );
+	MSG_FLAG_Init( &mf_ir_proximity );
 }
 
 /**
@@ -1000,6 +1001,40 @@ void Message_Handling_Task()
 		}
 		break;
 
+	case 'i':	// Send IR distances
+		if( usb_msg_length() >= MEGN540_Message_Len('i') )
+		{
+			// Remove first byte
+			usb_msg_get();
+
+			mf_ir_proximity.active = true;
+			mf_ir_proximity.duration = -1;
+		}
+		break;
+
+	case 'I':	// Send IR distances
+		if( usb_msg_length() >= MEGN540_Message_Len('I') )
+		{
+			// Remove first byte
+			usb_msg_get();
+
+			// Build structure to put data in
+			struct __attribute__((__packed__)) { float duration; } data;
+
+			// Copy the bytes from the usb receive buffer into structure
+			usb_msg_read_into( &data, sizeof(data) );
+
+			if(data.duration > 0.0)
+			{
+				mf_ir_proximity.active = true;
+				mf_ir_proximity.duration = data.duration * 1000;
+			} else {
+				char bad_input = '?';
+				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
+			}
+		}
+		break;
+
 	default:
 		// Clear input buffer
 		usb_flush_input_buffer();
@@ -1051,6 +1086,8 @@ uint8_t MEGN540_Message_Len( char cmd )
 		case 'D': return	13; break;
 		case 'v': return	9; break;
 		case 'V': return	13; break;
+		case 'i': return	1; break;
+		case 'I': return	5; break;
 		default:  return	0; break;
 	}
 }
