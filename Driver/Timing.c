@@ -144,7 +144,6 @@ void DelayMicroseconds(uint16_t us) {
 	// Don't waste your time for 1 us. Function overhead is long enough
 	// to last 1 us
 	if (us <= 1) return;
-	int j = 0;
 
 	// The loop below takes 1/4 of a microsecond per iteration, so
 	// quadruple the count.
@@ -154,14 +153,10 @@ void DelayMicroseconds(uint16_t us) {
 	us -= 5;
 
 	// Assembly busy-wait!
-//	__asm__ __volatile__ (
-//		"1: sbiw %0,1" "\n\t"				// 2 cycles
-//		"brne 1b" : "=w" (us) : "0" (us)	// 2 cycles
-//	);
-	for(int i = 0; i < us; i++) {
-		j += 1;
-	}
-	j += 1;
+	__asm__ __volatile__ (
+		"1: sbiw %0,1" "\n\t"				// 2 cycles
+		"brne 1b" : "=w" (us) : "0" (us)	// 2 cycles
+	);
 }
 
 /**
