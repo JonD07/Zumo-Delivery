@@ -42,12 +42,12 @@ void Servo_PWM_Init()
  */
 void Close_Servo()
 {
-	// Disable interrupts
+	// Configure timer
+	uint8_t oldSREG = SREG;
 	cli();
 	// Set compare value
 	OCR4A = DUTY_CYCLE_MAX;
-	// Enable interrupts
-	sei();
+	SREG = oldSREG;
 }
 
 /**
@@ -55,12 +55,12 @@ void Close_Servo()
  */
 void Open_Servo()
 {
-	// Disable interrupts
+	// Configure timer
+	uint8_t oldSREG = SREG;
 	cli();
 	// Set compare value
 	OCR4A = DUTY_CYCLE_MIN;
-	// Enable interrupts
-	sei();
+	SREG = oldSREG;
 }
 
 /**
