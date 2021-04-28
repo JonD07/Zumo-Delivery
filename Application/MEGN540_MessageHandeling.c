@@ -1035,6 +1035,33 @@ void Message_Handling_Task()
 		}
 		break;
 
+	case 'G':	// Send IR distances
+		if( usb_msg_length() >= MEGN540_Message_Len('G') )
+		{
+			// Remove first byte
+			usb_msg_get();
+
+			// Grab command from buffer (O:  open, C: closed)
+			char command;
+			usb_msg_read_into( &command, sizeof(command) );
+
+			if(command == 'O')
+			{
+				// Open the gripper
+				void Open_Servo();
+			}
+			else if (command == 'C') {
+				// Close the gripper
+				void Close_Servo();
+			}
+			else {
+				// Unrecognized command..
+				char bad_input = '?';
+				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
+			}
+		}
+		break;
+
 	default:
 		// Clear input buffer
 		usb_flush_input_buffer();
@@ -1088,6 +1115,7 @@ uint8_t MEGN540_Message_Len( char cmd )
 		case 'V': return	13; break;
 		case 'i': return	1; break;
 		case 'I': return	5; break;
+		case 'G': return	2; break;
 		default:  return	0; break;
 	}
 }
