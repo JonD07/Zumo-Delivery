@@ -340,7 +340,9 @@ class GuiSetup:
                 # If we are avoiding objects
                 if self.object_avoidance:
                     if dat[6] == 'i' or dat[6] == 'I':
-                        ir_val = int(dat[9:]) # TODO: Make sure this logic makes sense with whatever the IR is reporting back.
+                        data = dat[9:].split()
+                        ir_val = int(data[0])
+                        dir = data[1]
                         if ir_val >= self.MIN_IR_THRESHOLD:
                             # If the IR data is within a threshold send a stop command.
                             data_format = ['c']
@@ -349,14 +351,20 @@ class GuiSetup:
 
                             # TODO: Add in turning logic based on Jon's changes to I/i messages.
                             #Once stopped, send a turn 90degrees command
-                            data_format = ['c', 'f', 'f']
-                            data = ['d', 0.0, 1.5707]
-                            (sucess, err_msg) = self.serial_object.write(data, data_format)
+                            if dir == 'L':
+                                data_format = ['c', 'f', 'f']
+                                data = ['d', 0.0, -1.5707]
+                                (sucess, err_msg) = self.serial_object.write(data, data_format)
+                            elif dir == 'R':
+                                data_format = ['c', 'f', 'f']
+                                data = ['d', 0.0, 1.5707]
+                                (sucess, err_msg) = self.serial_object.write(data, data_format)
 
-                            # After the car is turned, keep going straight.
+                            # After the car is turned, stop.
                             data_format = ['c']
                             data = ['s']
                             (sucess, err_msg) = self.serial_object.write(data, data_format)
+                            # Then keep going straight.
                             data_format = ['c', 'h', 'h']
                             data = ['v', 0.1, 0.0]
                             (sucess, err_msg) = self.serial_object.write(data, data_format)
