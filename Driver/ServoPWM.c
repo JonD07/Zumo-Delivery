@@ -7,7 +7,7 @@
  * TODO: For safety (and the sake of not having fun), make sure that this is
  * initialized to the open position
  */
-void Servo_PWM_Init()
+void Servo_PWM_Init(eGripperState state)
 {
 	// Set fast-PWM, set at timer reset, clear on compare
 	TCCR4A |= 0b10000010;
@@ -24,7 +24,7 @@ void Servo_PWM_Init()
 	DDRC |= (1 << DDC7);
 
 	// Set compare value
-	OCR4A = DUTY_CYCLE_MIN;
+	OCR4A = (state == OPEN) ? DUTY_CYCLE_MIN : DUTY_CYCLE_MAX;
 
 	// Configure timer
 	uint8_t oldSREG = SREG;

@@ -46,7 +46,7 @@
  * Function Servo_PWM_Init initializes a PWM signal on Timer 4 for the gripper
  * servo motor.
  */
-void Servo_PWM_Init();
+void Servo_PWM_Init(eGripperState state);
 
 /**
  * Function Close_Servo sets the PWM duty cycle for the servo to close.

@@ -1048,14 +1048,16 @@ void Message_Handling_Task()
 			if(command == 'O')
 			{
 				// Open the gripper
-				void Open_Servo();
+//				void Open_Servo();
+				Servo_PWM_Init(OPEN);
 				// Echo command
 				char bad_input = 'O';
 				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
 			}
 			else if (command == 'C') {
 				// Close the gripper
-				void Close_Servo();
+//				void Close_Servo();
+				Servo_PWM_Init(CLOSE);
 				// Echo command
 				char bad_input = 'C';
 				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));

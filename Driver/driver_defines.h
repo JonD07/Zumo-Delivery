@@ -15,6 +15,12 @@ typedef enum
 	RIGHT
 } eProximitySize;
 
+typedef enum
+{
+	OPEN,
+	CLOSE
+} eGripperState;
+
 
 typedef struct t_ProximityReturn {
 	uint16_t m_nCount;
