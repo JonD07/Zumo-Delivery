@@ -1049,10 +1049,16 @@ void Message_Handling_Task()
 			{
 				// Open the gripper
 				void Open_Servo();
+				// Echo command
+				char bad_input = 'O';
+				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
 			}
 			else if (command == 'C') {
 				// Close the gripper
 				void Close_Servo();
+				// Echo command
+				char bad_input = 'C';
+				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
 			}
 			else {
 				// Unrecognized command..
