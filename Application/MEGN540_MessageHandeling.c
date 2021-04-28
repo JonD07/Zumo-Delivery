@@ -1045,51 +1045,51 @@ void Message_Handling_Task()
 			char command;
 			usb_msg_read_into( &command, sizeof(command) );
 
-			if(command == '0')
+			if(command == 'a')
 			{
 				// Open the gripper
 //				void Open_Servo();
 				Servo_PWM_Init(OPEN);
 				// Echo command
-				char bad_input = '0';
+				char bad_input = 'a';
 				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
 			}
 
-			if(command == '1')
+			if(command == 'b')
 			{
 				// Open the gripper
 //				void Open_Servo();
 				Servo_PWM_Init(M25);
 				// Echo command
-				char bad_input = '1';
+				char bad_input = 'b';
 				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
 			}
 
-			if(command == '2')
+			if(command == 'c')
 			{
 				// Open the gripper
 //				void Open_Servo();
 				Servo_PWM_Init(M50);
 				// Echo command
-				char bad_input = '2';
+				char bad_input = 'c';
 				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
 			}
 
-			if(command == '3')
+			if(command == 'd')
 			{
 				// Open the gripper
 //				void Open_Servo();
 				Servo_PWM_Init(M75);
 				// Echo command
-				char bad_input = '3';
+				char bad_input = 'd';
 				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
 			}
-			else if (command == '4') {
+			else if (command == 'e') {
 				// Close the gripper
 //				void Close_Servo();
 				Servo_PWM_Init(CLOSE);
 				// Echo command
-				char bad_input = '4';
+				char bad_input = 'e';
 				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
 			}
 			else {
