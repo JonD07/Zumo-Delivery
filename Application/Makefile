@@ -33,6 +33,7 @@ SRC = $(TARGET).c       \
 	${MEGN_DRIVER_PATH}/Filter.c\
 	${MEGN_DRIVER_PATH}/Controller.c\
 	${MEGN_DRIVER_PATH}/Proximity.c\
+	${MEGN_DRIVER_PATH}/ServoPWM.c\
 	$(MEGN_DRIVER_PATH)/USB_Config/Descriptors.c       \
 	$(LUFA_SRC_USB)
 

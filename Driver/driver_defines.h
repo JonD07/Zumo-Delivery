@@ -4,6 +4,9 @@
 #ifndef DRIVER_DEFINES_H
 #define DRIVER_DEFINES_H
 
+#include <ctype.h>
+#include <stdbool.h>
+
 #define PI		3.14159
 
 typedef enum
@@ -11,6 +14,12 @@ typedef enum
 	LEFT = 1,
 	RIGHT
 } eProximitySize;
+
+typedef enum
+{
+	OPEN,
+	CLOSE
+} eGripperState;
 
 
 typedef struct t_ProximityReturn {

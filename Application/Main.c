@@ -56,6 +56,8 @@ void InitializeSystem()
 	Motor_PWM_Init(0x190); // 400 => 20 kHz
 	// Initialize IR proximity sensor
 	Proxy_Init();
+	// Configure the servo motor for the gripper
+	Servo_PWM_Init(OPEN);
 	// Initialize USB
 	USB_SetupHardware();
 

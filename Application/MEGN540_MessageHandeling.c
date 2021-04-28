@@ -1035,6 +1035,35 @@ void Message_Handling_Task()
 		}
 		break;
 
+	case 'G':	// Send IR distances
+		if( usb_msg_length() >= MEGN540_Message_Len('G') )
+		{
+			// Remove first byte
+			usb_msg_get();
+
+			// Grab command from buffer (O:  open, C: closed)
+			char command;
+			usb_msg_read_into( &command, sizeof(command) );
+
+			if(command == '0')
+			{
+				// Open the gripper
+//				void Open_Servo();
+				Servo_PWM_Init(OPEN);
+			}
+			else if (command == 'e') {
+				// Close the gripper
+//				void Close_Servo();
+				Servo_PWM_Init(CLOSE);
+			}
+			else {
+				// Unrecognized command..
+				char bad_input = '?';
+				usb_send_msg("cc", 'G', &bad_input, sizeof(bad_input));
+			}
+		}
+		break;
+      
     case 'O':	// Object Avoidance
       if( usb_msg_length() >= MEGN540_Message_Len('O') )
       {
@@ -1064,7 +1093,7 @@ void Message_Handling_Task()
           mf_ir_proximity.active = false;
         }
         break;
-
+      
 	default:
 		// Clear input buffer
 		usb_flush_input_buffer();
@@ -1118,6 +1147,7 @@ uint8_t MEGN540_Message_Len( char cmd )
 		case 'V': return	13; break;
 		case 'i': return	1; break;
 		case 'I': return	5; break;
+		case 'G': return	2; break;
 		default:  return	0; break;
 	}
 }
