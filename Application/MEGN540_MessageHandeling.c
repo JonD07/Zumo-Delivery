@@ -1054,14 +1054,14 @@ void Message_Handling_Task()
 				// Echo command
 				usb_send_msg("cc", input, &command, sizeof(command));
 			}
-			else if(command == '1') {
+			else if(command == '1') { // Full open
 				// Open the gripper
 //				void Open_Servo();
 				Servo_PWM_Init(M25);
 				// Echo command
 				usb_send_msg("cc", input, &command, sizeof(command));
 			}
-			else if(command == 'c') {
+			else if(command == 'c') {// 60 ish is closed
 				// Open the gripper
 //				void Open_Servo();
 				Servo_PWM_Init(M50);

@@ -37,9 +37,11 @@
 
 #include "driver_defines.h"
 
-#define DUTY_CYCLE_MIN	8
-#define DUTY_CYCLE_MAX	16
-#define MAX_PWM			156
+#define DUTY_CYCLE_MIN		8
+#define DUTY_CYCLE_MAX		16
+#define DUTY_CYCLE_OPEN		10
+#define DUTY_CYCLE_CLOSED	13
+#define MAX_PWM				156
 
 
 /**
