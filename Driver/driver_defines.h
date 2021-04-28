@@ -12,4 +12,10 @@ typedef enum
 	RIGHT
 } eProximitySize;
 
+
+typedef struct t_ProximityReturn {
+	uint16_t m_nCount;
+	eProximitySize m_eSide;
+} t_ProximityReturn;
+
 #endif
