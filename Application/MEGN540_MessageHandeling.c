@@ -1035,6 +1035,36 @@ void Message_Handling_Task()
 		}
 		break;
 
+    case 'O':	// Object Avoidance
+      if( usb_msg_length() >= MEGN540_Message_Len('O') )
+      {
+        // Remove first byte
+        usb_msg_get();
+
+        // Build structure to put data in
+        struct __attribute__((__packed__)) { float duration; } data;
+
+        // Copy the bytes from the usb receive buffer into structure
+        usb_msg_read_into( &data, sizeof(data) );
+
+        if(data.duration > 0.0)
+        {
+          mf_ir_proximity.active = true;
+          mf_ir_proximity.duration = data.duration * 1000;
+        } else {
+          char bad_input = '?';
+          usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
+        }
+      }
+      break;
+
+      case 'X':	// Object Avoidance
+        if( usb_msg_length() >= MEGN540_Message_Len('X') )
+        {
+          mf_ir_proximity.active = false;
+        }
+        break;
+
 	default:
 		// Clear input buffer
 		usb_flush_input_buffer();
