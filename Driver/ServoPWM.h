@@ -1,12 +1,5 @@
 /*
-         MEGN540 Mechatronics Lab
-    Copyright (C) Andrew Petruska, 2021.
-       apetruska [at] mines [dot] edu
-          www.mechanical.mines.edu
-*/
-
-/*
-    Copyright (c) 2021 Andrew Petruska at Colorado School of Mines
+    Copyright (c) 2021 Aidan Naughton and Jonathan Diller at Colorado School of Mines
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -39,10 +32,8 @@
 #ifndef SERVO_PWM_H
 #define SERVO_PWM_H
 
-#include <avr/interrupt.h> // for interrupt enable/disable
-#include <avr/io.h>        // For pin input/output access
-#include <ctype.h>         // For int32_t type
-#include <stdbool.h>       // For bool
+#include <avr/interrupt.h>
+#include <avr/io.h>
 
 #include "driver_defines.h"
 
@@ -50,11 +41,10 @@
 #define DUTY_CYCLE_MAX	16
 #define MAX_PWM			156
 
+
 /**
- * Function ServoPWM_Init initializes the Servo PWM on Timer 1 for PWM based voltage control of the Servos.
- * The Servo PWM system shall initialize in the disabled state for safety reasons. You should specifically enable
- * Servo PWM outputs only as necessary.
- * @param [uint16_t] MAX_PWM is the maximum PWM value to use. This controls the PWM frequency.
+ * Function Servo_PWM_Init initializes a PWM signal on Timer 4 for the gripper
+ * servo motor.
  */
 void Servo_PWM_Init();
 

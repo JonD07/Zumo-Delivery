@@ -1,10 +1,11 @@
 #include "ServoPWM.h"
 
 /**
- * Function Servo_PWM_Init initializes the Servo PWM on Timer 4 for PWM based voltage control of the servo.
- * The Servo PWM system shall initialize in the disabled state for safety reasons. You should specifically enable
- * Servo PWM outputs only as necessary.
- * @param [uint16_t] MAX_PWM is the maximum PWM value to use. This controls the PWM frequency.
+ * Function Servo_PWM_Init initializes a PWM signal on Timer 4 for the gripper
+ * servo motor.
+ *
+ * TODO: For safety (and the sake of not having fun), make sure that this is
+ * initialized to the open position
  */
 void Servo_PWM_Init()
 {

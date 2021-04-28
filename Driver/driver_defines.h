@@ -4,6 +4,9 @@
 #ifndef DRIVER_DEFINES_H
 #define DRIVER_DEFINES_H
 
+#include <ctype.h>
+#include <stdbool.h>
+
 #define PI		3.14159
 
 typedef enum
