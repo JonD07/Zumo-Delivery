@@ -61,7 +61,7 @@ void IRRead(eProximitySize side);
 /*
  * Returns max( left-LED-counts, right-LED-counts)
  */
-uint16_t IR_Counts();
+t_ProximityReturn IR_Counts();
 
 /*
  * This function starts the IR LED strobe based on the given
