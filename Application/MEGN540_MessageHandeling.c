@@ -1043,7 +1043,6 @@ void Message_Handling_Task()
 
 			// Grab command from buffer (O:  open, C: closed)
 			char command;
-			char input = 'G';
 			usb_msg_read_into( &command, sizeof(command) );
 
 			if(command == '0')
@@ -1051,41 +1050,16 @@ void Message_Handling_Task()
 				// Open the gripper
 //				void Open_Servo();
 				Servo_PWM_Init(OPEN);
-				// Echo command
-				usb_send_msg("cc", input, &command, sizeof(command));
-			}
-			else if(command == '1') { // Full open
-				// Open the gripper
-//				void Open_Servo();
-				Servo_PWM_Init(M25);
-				// Echo command
-				usb_send_msg("cc", input, &command, sizeof(command));
-			}
-			else if(command == 'c') {// 60 ish is closed
-				// Open the gripper
-//				void Open_Servo();
-				Servo_PWM_Init(M50);
-				// Echo command
-				usb_send_msg("cc", input, &command, sizeof(command));
-			}
-			else if(command == 'd') {
-				// Open the gripper
-//				void Open_Servo();
-				Servo_PWM_Init(M75);
-				// Echo command
-				usb_send_msg("cc", input, &command, sizeof(command));
 			}
 			else if (command == 'e') {
 				// Close the gripper
 //				void Close_Servo();
 				Servo_PWM_Init(CLOSE);
-				// Echo command
-				usb_send_msg("cc", input, &command, sizeof(command));
 			}
 			else {
 				// Unrecognized command..
 				char bad_input = '?';
-				usb_send_msg("cc", input, &bad_input, sizeof(bad_input));
+				usb_send_msg("cc", 'G', &bad_input, sizeof(bad_input));
 			}
 		}
 		break;

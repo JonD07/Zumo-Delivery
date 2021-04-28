@@ -18,9 +18,6 @@ typedef enum
 typedef enum
 {
 	OPEN,
-	M25,
-	M50,
-	M75,
 	CLOSE
 } eGripperState;
 
