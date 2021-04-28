@@ -29,24 +29,11 @@
 */
 
 /**
- * ServoPWM.h/c defines the functions necessary to interface with the Timer 1 PWM control of the Servos on the
- * the Pololu Zumo 32U4 car. For information regarding Timer 1 PWM please consult Section 14 of the atmega32U4 datasheet
- * https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7766-8-bit-AVR-ATmega16U4-32U4_Datasheet.pdf
- *
- * The Left Servo pwm output is connected to the OC1B pin with the directionality controlled by PB2.
- * The Right Servo pwm output is connected to the OC1A pin with the directionality controlled by PB1.
- *
- * For Servo control we will want to use either of the phase-corrected PWM output types.  Because OC1A/B will be used to
- * send the PWM to the Servo driver chip, we'll need to set the PWM frequency (TOP) through the ICR1 register, this
- * effectively sets the max PWM value, which can be a uint16 thing.  Thee  DRV8838 Servo driver circuit is rated for
- * a PWM signal of up to 250kHz, you may want to experiment with a few different values, but start with a 20kHz base
- * frequency (Note that, humans can hear up-to about 20kHz, so a 10kHz PWM frequency might be audible).
- *
- * Note that the base frequency with no prescalar is given by:
- *          16Mhz / (2 * TOP), where 2 is because were using the phase-corrected mode.
- *
- * To Disable or enable the car's PWM functionality use table 14-3 to identify how to disconnect or connect the OC1A/B
- * output pin changes.
+ * ServoPWM.h/c defines functions used to control the gripper servo motor. The
+ * servo motor needs to run on an electrical pulse with a period of 20 ms (50 Hz)
+ * and pulses between 1 ms and 2 ms. The motor will be turned completely in one
+ * direction when the pulses are 1 ms long and 180 degrees in the opposite
+ * direction when the pulses are 2 ms.
  *
  */
 #ifndef SERVO_PWM_H
@@ -59,52 +46,31 @@
 
 #include "driver_defines.h"
 
+#define DUTY_CYCLE_MIN	8
+#define DUTY_CYCLE_MAX	16
+#define MAX_PWM			156
+
 /**
  * Function ServoPWM_Init initializes the Servo PWM on Timer 1 for PWM based voltage control of the Servos.
  * The Servo PWM system shall initialize in the disabled state for safety reasons. You should specifically enable
  * Servo PWM outputs only as necessary.
  * @param [uint16_t] MAX_PWM is the maximum PWM value to use. This controls the PWM frequency.
  */
-void Servo_PWM_Init( uint16_t MAX_PWM );
+void Servo_PWM_Init();
 
 /**
- * Function ServoPWM_Enable enables or disables the Servo PWM outputs.
- * @param [bool] enable (true set enable, false set disable)
+ * Function Close_Servo sets the PWM duty cycle for the servo to close.
  */
-void Servo_PWM_Enable( bool enable );
+void Close_Servo();
 
 /**
- * Function Is_Servo_PWM_Enabled returns if the Servo PWM is enabled for output.
- * @param [bool] true if enabled, false if disabled
+ * Function Open_Servo sets the PWM duty cycle for the servo to open.
  */
-bool Is_Servo_PWM_Enabled();
+void Open_Servo();
 
 /**
- * Function Servo_PWM_Left sets the PWM duty cycle for the left Servo.
- * @return [int32_t] The count number.
+ * Function Servo_Is_Closed returns true if the gripper is closed
  */
-void Servo_PWM( int16_t pwm );
-
-
-/**
- * Function Get_Servo_PWM_Left returns the current PWM duty cycle for the left Servo. If disabled it returns what the
- * PWM duty cycle would be.
- * @return [int16_t] duty-cycle for the left Servo's pwm
- */
-int16_t Get_Servo_PWM();
-
-
-/**
- * Function Get_MAX_Servo_PWM() returns the PWM count that corresponds to 100 percent duty cycle (all on), this is the
- * same as the value written into ICR1 as (TOP).
- */
-uint16_t Get_MAX_Servo_PWM();
-
-/**
- * Function Set_MAX_Servo_PWM sets the maximum pwm count. This function sets the timer counts to zero because
- * the ICR1 can cause undesired behaviors if change dynamically below the current counts.  See page 128 of the
- * atmega32U4 datasheat.
- */
-void Set_MAX_Servo_PWM( uint16_t MAX_PWM );
+bool Servo_Is_Closed();
 
 #endif

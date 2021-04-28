@@ -12,4 +12,5 @@
 #include "Proximity.h"
 #include "Ring_Buffer.h"
 #include "SerialIO.h"
+#include "ServoPWM.h"
 #include "Timing.h"

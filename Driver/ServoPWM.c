@@ -6,114 +6,66 @@
  * Servo PWM outputs only as necessary.
  * @param [uint16_t] MAX_PWM is the maximum PWM value to use. This controls the PWM frequency.
  */
-void Servo_PWM_Init( uint16_t MAX_PWM )
+void Servo_PWM_Init()
 {
-	/*
-	Enable phase and frequency correct PWM waveform generation mode, set register WGM41 to 0, WGM40 to 1, PWM4A to 1
-	*/
-	TCCR4A &= 0b00001111; // Disable output, set COM4A1, COM4A0 to 0
-	TCCR4A |= 0b00000010; // PWM4A = 1
-	TCCR4D &= 0b11111101; // WGM41 = 0
-	TCCR4D |= 0b00000001; // WGM40 = 1
+	// Set fast-PWM, set at timer reset, clear on compare
+	TCCR4A |= 0b10000010;
+	TCCR4A &= ~(0b01000000);
 
-	//Set DDR pins for OC4A -> PC7
+	// Enable clock with prescaler of 2048
+	TCCR4B &= ~(0x0F);
+	TCCR4B |= (0x0C);
+
+	// Set PWM fast-mode
+	TCCR4D &= ~(0b00000011);
+
+	// Set DDR pin to write for OC4A -> PC7
 	DDRC |= (1 << DDC7);
 
-	cli(); // Disable Interrupts
-	OCR4C = MAX_PWM; //Set TOP value
-	sei(); // Enable Interrupts
+	// Set compare value
+	OCR4A = DUTY_CYCLE_MIN;
+
+	// Configure timer
+	uint8_t oldSREG = SREG;
+	cli();
+	// Set TOP value
+	OCR4C = MAX_PWM;
+	// Clear timer
+	TCNT4 = 0;
+	TC4H &= ~(0x07);
+	SREG = oldSREG;
 }
 
 /**
- * Function ServoPWM_Enable enables or disables the Servo PWM outputs.
- * @param [bool] enable (true set enable, false set disable)
- */
-void Servo_PWM_Enable( bool enable )
-{
-	if(enable==true)
-	{
-		TCCR4A |= 0b11110000;
-	}
-	else
-	{
-		TCCR4A &= 0b00001111;
-	}
-}
-
-/**
- * Function Is_Servo_PWM_Enabled returns if the Servo PWM is enabled for output.
- * @param [bool] true if enabled, false if disabled
- */
-bool Is_Servo_PWM_Enabled()
-{
-	if((TCCR4A&(1<<COM4A1)) && (TCCR4A&(1<<COM4A0)))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-/**
- * Function Servo_PWM sets the PWM duty cycle for the servo to close.
+ * Function Close_Servo sets the PWM duty cycle for the servo to close.
  */
 void Close_Servo()
 {
-
-	// pwm = (pwm > 100) ? 100 : pwm;
-	// // Disable interrupts
-	// cli();
-	// OCR1A = (int16_t)((((float)pwm * -0.01) + 1) * ICR1);
-	// // Enable interrupts
-	// sei();
+	// Disable interrupts
+	cli();
+	// Set compare value
+	OCR4A = DUTY_CYCLE_MAX;
+	// Enable interrupts
+	sei();
 }
 
 /**
- * Function Servo_PWM sets the PWM duty cycle for the servo to open.
+ * Function Open_Servo sets the PWM duty cycle for the servo to open.
  */
 void Open_Servo()
 {
-
-	// pwm = (pwm > 100) ? 100 : pwm;
-	// // Disable interrupts
-	// cli();
-	// OCR1A = (int16_t)((((float)pwm * -0.01) + 1) * ICR1);
-	// // Enable interrupts
-	// sei();
-}
-
-/**
- * Function Get_Servo_PWM returns the current PWM duty cycle for the Servo. If disabled it returns what the
- * PWM duty cycle would be.
- * @return [int16_t] duty-cycle for the left Servo's pwm
- */
-int16_t Get_Servo_PWM()
-{
-	return -100*(OCR1B / (float)Get_MAX_Servo_PWM()) + 100;
-}
-
-/**
- * Function Get_MAX_Servo_PWM() returns the PWM count that corresponds to 100 percent duty cycle (all on), this is the
- * same as the value written into ICR1 as (TOP).
- */
-uint16_t Get_MAX_Servo_PWM()
-{
-	return ICR1;
-}
-
-/**
- * Function Set_MAX_Servo_PWM sets the maximum pwm count. This function sets the timer counts to zero because
- * the ICR1 can cause undesired behaviors if change dynamically below the current counts.  See page 128 of the
- * atmega32U4 datasheat.
- */
-void Set_MAX_Servo_PWM( uint16_t MAX_PWM )
-{
 	// Disable interrupts
 	cli();
-	//Set the TOP value (ICR1) equal to MAX_PWM
-	ICR1 = MAX_PWM;
+	// Set compare value
+	OCR4A = DUTY_CYCLE_MIN;
 	// Enable interrupts
 	sei();
+}
+
+/**
+ * Function Servo_Is_Closed returns true if the gripper is closed
+ */
+bool Servo_Is_Closed()
+{
+	return (OCR4A < (DUTY_CYCLE_MIN + 10));
 }
