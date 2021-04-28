@@ -141,12 +141,12 @@ void start_strobe(eProximitySize side, uint16_t brightness) {
 	DDRC |= (1 << 6);
 
 	if(side == LEFT) {
-		// Set PORTF6
-		PORTF |= (1 << 6);
-	}
-	else if(side == RIGHT) {
 		// Clear PORTF6
 		PORTF &= ~(1 << 6);
+	}
+	else if(side == RIGHT) {
+		// Set PORTF6
+		PORTF |= (1 << 6);
 	}
 
 	// Set PORTF6 as an output
