@@ -24,7 +24,7 @@ void Servo_PWM_Init(eGripperState state)
 	DDRC |= (1 << DDC7);
 
 	// Set compare value
-	uint8_t duty_cycle;
+	uint8_t duty_cycle = DUTY_CYCLE_MAX;
 	switch(state) {
 	case OPEN:
 		duty_cycle = DUTY_CYCLE_MIN;
@@ -43,6 +43,7 @@ void Servo_PWM_Init(eGripperState state)
 		break;
 	}
 //	OCR4A = (state == OPEN) ? DUTY_CYCLE_MIN : DUTY_CYCLE_MAX;
+	OCR4A = duty_cycle;
 
 	// Configure timer
 	uint8_t oldSREG = SREG;
