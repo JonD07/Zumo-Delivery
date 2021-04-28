@@ -33,10 +33,10 @@ static const uint16_t pulseOnTimeUs = 421;
 // Need to wait 6 cycles to read after turning on. 22/(38 kHz) = 578 us
 static const uint16_t pulseOffTimeUs = 578;
 
-static uint16_t m_nLEDProxyCount;
+static uint16_t m_nLEDProxyCountLeft;
+static uint16_t m_nLEDProxyCountRight;
 
 // Brightness levels
-//static uint16_t levelsArray[] = { 4, 15, 32, 55, 85, 120 };
 static uint16_t levelsArray[] = { 4, 15 };
 // This needs to reflect the size of the above array!
 static uint8_t numLevels = 2;
@@ -46,7 +46,8 @@ static uint8_t numLevels = 2;
  * Initializes the front facing IR proximity sensor
  */
 void Proxy_Init() {
-	m_nLEDProxyCount = 0;
+	m_nLEDProxyCountLeft = 0;
+	m_nLEDProxyCountRight = 0;
 }
 
 /*
@@ -69,7 +70,10 @@ void IRRead(eProximitySize side) {
 
 	// Reset the IR readings
 	if(side == LEFT) {
-		m_nLEDProxyCount = 0;
+		m_nLEDProxyCountLeft = 0;
+	}
+	else if(side == RIGHT) {
+		m_nLEDProxyCountRight = 0;
 	}
 
 	for(int i = 0; i < numLevels; i++) {
@@ -79,7 +83,12 @@ void IRRead(eProximitySize side) {
 		DelayMicroseconds(pulseOnTimeUs);
 		// Record result. If the pin is low, then we have a hit at this brightness
 		if(!bit_is_set(PINF, 1)) {
-			m_nLEDProxyCount++;
+			if(side == LEFT) {
+				m_nLEDProxyCountLeft++;
+			}
+			else if(side == RIGHT) {
+				m_nLEDProxyCountRight++;
+			}
 		}
 		// Shut-off strobe
 		stop_strobe();
@@ -91,8 +100,21 @@ void IRRead(eProximitySize side) {
 /*
  * Returns max( left-LED-counts, right-LED-counts)
  */
-uint16_t IR_Counts() {
-	return m_nLEDProxyCount;
+t_ProximityReturn IR_Counts() {
+	t_ProximityReturn ret_val;
+
+	if(m_nLEDProxyCountLeft >= m_nLEDProxyCountRight) {
+		// Return the left hand reading
+		ret_val.m_nCount = m_nLEDProxyCountLeft;
+		ret_val.m_eSide = LEFT;
+	}
+	else {
+		// Return the right hand reading
+		ret_val.m_nCount = m_nLEDProxyCountRight;
+		ret_val.m_eSide = RIGHT;
+	}
+
+	return ret_val;
 }
 
 /*
@@ -119,12 +141,12 @@ void start_strobe(eProximitySize side, uint16_t brightness) {
 	DDRC |= (1 << 6);
 
 	if(side == LEFT) {
-		// Set PORTF6
-		PORTF |= (1 << 6);
-	}
-	else if(side == RIGHT) {
 		// Clear PORTF6
 		PORTF &= ~(1 << 6);
+	}
+	else if(side == RIGHT) {
+		// Set PORTF6
+		PORTF |= (1 << 6);
 	}
 
 	// Set PORTF6 as an output

@@ -544,17 +544,24 @@ int main(void)
 				// Run right side of distance sensor
 				IRRead(RIGHT);
 				// Read distance data and return
-				int16_t prox_out = IR_Counts();
+				t_ProximityReturn prox_out = IR_Counts();
+				// Record return values
+				struct { int16_t count; char side; } data =
+				{
+						.count = prox_out.m_nCount,
+						// The side measurement detected on (defaults to L if equal)
+						.side = (prox_out.m_eSide == LEFT) ? 'L' : 'R'
+				};
 				// Return data to user
 				if(mf_ir_proximity.duration <= 0)
 				{
 					mf_ir_proximity.active = false;
-					usb_send_msg( "ch", 'i', &prox_out, sizeof(prox_out) );
+					usb_send_msg( "chc", 'i', &data, sizeof(data) );
 				}
 				else
 				{
 					mf_ir_proximity.last_trigger_time = GetTime();
-					usb_send_msg( "ch", 'I', &prox_out, sizeof(prox_out) );
+					usb_send_msg( "chc", 'I', &data, sizeof(data) );
 				}
 				proxy_first = true;
 			}
