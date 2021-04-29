@@ -1063,37 +1063,53 @@ void Message_Handling_Task()
 			}
 		}
 		break;
-      
-    case 'O':	// Object Avoidance
-      if( usb_msg_length() >= MEGN540_Message_Len('O') )
+
+  case 'O':	// Object Avoidance
+    if( usb_msg_length() >= MEGN540_Message_Len('O') )
+    {
+      // Remove first byte
+      usb_msg_get();
+
+      // Build structure to put data in
+      struct __attribute__((__packed__)) { float duration; } data;
+
+      // Copy the bytes from the usb receive buffer into structure
+      usb_msg_read_into( &data, sizeof(data) );
+
+      if(data.duration > 0.0)
       {
-        // Remove first byte
-        usb_msg_get();
-
-        // Build structure to put data in
-        struct __attribute__((__packed__)) { float duration; } data;
-
-        // Copy the bytes from the usb receive buffer into structure
-        usb_msg_read_into( &data, sizeof(data) );
-
-        if(data.duration > 0.0)
-        {
-          mf_ir_proximity.active = true;
-          mf_ir_proximity.duration = data.duration * 1000;
-        } else {
-          char bad_input = '?';
-          usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
-        }
+        mf_obj_avoidance.active = true;
+        mf_obj_avoidance.duration = data.duration * 1000;
+      } else {
+        char bad_input = '?';
+        usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
       }
-      break;
+    }
+    break;
 
-      case 'X':	// Object Avoidance
-        if( usb_msg_length() >= MEGN540_Message_Len('X') )
-        {
-          mf_ir_proximity.active = false;
-        }
-        break;
-      
+  case 'X':	// Object Avoidance
+    if( usb_msg_length() >= MEGN540_Message_Len('X') )
+    {
+      mf_obj_avoidance.active = false;
+      mf_motor_dist_control.active = false;
+			mf_motor_vel_control.active = false;
+			mf_motor_stop.active = false;
+			mf_timed_pwm.active = false;
+
+      // Disable PWM
+			Motor_PWM_Enable(false);
+			// Stop PWM
+			Motor_PWM_Left(0);
+			Motor_PWM_Right(0);
+
+			// Stop controllers
+			Controller_Set_Target_Position(&ctr_LeftMotor, 0.0);
+			Controller_Set_Target_Position(&ctr_RightMotor, 0.0);
+			Controller_Set_Target_Velocity(&ctr_LeftMotor, 0.0);
+			Controller_Set_Target_Velocity(&ctr_RightMotor, 0.0);
+    }
+    break;
+
 	default:
 		// Clear input buffer
 		usb_flush_input_buffer();
