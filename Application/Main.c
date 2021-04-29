@@ -33,7 +33,7 @@
 #include "Obstacle_Avoidance.h"
 #include "application_defines.h"
 
-#define DEBUG		1
+#define DEBUG		0
 #define CNTRL_SYS	0
 #define KP_L		0.1875335
 #define KP_R		0.1728258

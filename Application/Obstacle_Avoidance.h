@@ -34,9 +34,9 @@
 #include "../Driver/include_driver.h"
 #include "application_defines.h"
 
-#define OA_TURN_VELOCITY	1.0
-#define OA_ANGLR_VELOCITY	1.0
-#define OA_DRIVE_DC			25
+#define OA_TURN_VELOCITY	0.07
+#define OA_ANGLR_VELOCITY	1.5
+#define OA_DRIVE_DC			30
 #define OA_HOLD_TIMEOUT		200
 
 typedef enum
