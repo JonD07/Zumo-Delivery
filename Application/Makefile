@@ -23,9 +23,10 @@ TARGET       = Main
 
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c       \
+	$(APP_PATH)/MEGN540_MessageHandeling.c \
+	${APP_PATH}/Obstacle_Avoidance.c\
 	$(MEGN_DRIVER_PATH)/SerialIO.c			\
 	$(MEGN_DRIVER_PATH)/Ring_Buffer.c		\
-	$(APP_PATH)/MEGN540_MessageHandeling.c \
 	$(MEGN_DRIVER_PATH)/Timing.c				\
 	${MEGN_DRIVER_PATH}/Encoder.c \
 	${MEGN_DRIVER_PATH}/MotorPWM.c\

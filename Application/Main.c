@@ -30,6 +30,8 @@
 
 #include "../Driver/include_driver.h"
 #include "MEGN540_MessageHandeling.h"
+#include "Obstacle_Avoidance.h"
+#include "application_defines.h"
 
 #define DEBUG		1
 #define CNTRL_SYS	0
@@ -69,6 +71,8 @@ void InitializeSystem()
 	Controller_Init(&ctr_RightMotor, KP_R, num_right, den_right, 1, 10); // 10ms => 100 Hz
 	// Initialize message handling
 	Message_Handling_Init();
+	// Initialize obstacle avoidance logic
+	Init_Obstacle_Avoidance();
 
 	/*
 	 * Enable Global Interrupts for USB and Timer etc.
@@ -570,56 +574,9 @@ int main(void)
 		// Handle Object Avoidance flag
 		if(MSG_FLAG_Execute(&mf_obj_avoidance))
 		{
-			if(proxy_first) {
-				// Run just one side of the sensor
-				IRRead(LEFT);
-				proxy_first = false;
-			}
-			else {
-				// Run right side of distance sensor
-				IRRead(RIGHT);
-				// Read distance data and return
-				t_ProximityReturn prox_out = IR_Counts();
-				// Record return values
-				struct { int16_t count; char side; } data =
-				{
-						.count = prox_out.m_nCount,
-						// The side measurement detected on (defaults to L if equal)
-						.side = (prox_out.m_eSide == LEFT) ? 'L' : 'R'
-				};
-
-				// Parse Data
-				if(data.count >= 1){
-					// Stop
-					// Disable PWM
-					Motor_PWM_Enable(false);
-					// Stop PWM
-					Motor_PWM_Left(0);
-					Motor_PWM_Right(0);
-					// Stop controllers
-					Controller_Set_Target_Position(&ctr_LeftMotor, 0.0);
-					Controller_Set_Target_Position(&ctr_RightMotor, 0.0);
-					Controller_Set_Target_Velocity(&ctr_LeftMotor, 0.0);
-					Controller_Set_Target_Velocity(&ctr_RightMotor, 0.0);
-
-					//TODO: How do we tell the car to turn / drive straight with only hard-coded values (not passing messages) and only in this file? Do we copy the logic from the message handling side and then just enable the mf_motor_dist_control flag?
-
-					// turn
-
-
-					// then go straight
-				}
-				else{
-					// Go straight.
-				}
-
-
-
-
-
-
+			if(!Run_OA_Task()) {
+				// Reset timer
 				mf_obj_avoidance.last_trigger_time = GetTime();
-				proxy_first = true;
 			}
 		}
 
