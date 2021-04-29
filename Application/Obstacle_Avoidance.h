@@ -37,7 +37,7 @@
 #define OA_TURN_VELOCITY	0.07
 #define OA_ANGLR_VELOCITY	1.5
 #define OA_DRIVE_DC			30
-#define OA_HOLD_TIMEOUT		200
+#define OA_HOLD_TIMEOUT		4
 
 typedef enum
 {
