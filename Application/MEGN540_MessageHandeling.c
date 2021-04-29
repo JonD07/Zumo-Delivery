@@ -433,6 +433,9 @@ void Message_Handling_Task()
 	case 'S':
 		if( usb_msg_length() >= MEGN540_Message_Len('s') )
 		{
+			// Reset all motor control related flags
+			Reset_Drive_Flags();
+
 			// Remove char byte
 			usb_msg_get();
 
@@ -447,12 +450,6 @@ void Message_Handling_Task()
 			Controller_Set_Target_Position(&ctr_RightMotor, 0.0);
 			Controller_Set_Target_Velocity(&ctr_LeftMotor, 0.0);
 			Controller_Set_Target_Velocity(&ctr_RightMotor, 0.0);
-
-			// Deactivate other flags
-			mf_motor_dist_control.active = false;
-			mf_motor_vel_control.active = false;
-			mf_motor_stop.active = false;
-			mf_timed_pwm.active = false;
 		}
 		break;
 
@@ -527,6 +524,9 @@ void Message_Handling_Task()
 			// Check power levels
 			if(bat_val >= 4.75)
 			{
+				// Reset all motor control related flags
+				Reset_Drive_Flags();
+
 				float distance_left = 0;
 				float distance_right = 0;
 				float velocity_left = 0;
@@ -615,11 +615,6 @@ void Message_Handling_Task()
 				// Set flags
 				mf_motor_dist_control.active = true;
 				mf_motor_dist_control.duration = ctr_LeftMotor.update_period;
-
-				// Deactivate other flags
-				mf_motor_vel_control.active = false;
-				mf_motor_stop.active = false;
-				mf_timed_pwm.active = false;
 			}
 			else if(bat_val < 3.0) // Battery Low
 			{
@@ -673,6 +668,9 @@ void Message_Handling_Task()
 			// Check power levels
 			if(bat_val >= 4.75)
 			{
+				// Reset all motor control related flags
+				Reset_Drive_Flags();
+
 				float distance_left = 0;
 				float distance_right = 0;
 				float velocity_left = 0;
@@ -764,10 +762,6 @@ void Message_Handling_Task()
 				mf_motor_stop.active = true;
 				mf_motor_stop.duration = data.duration * 1000;
 				mf_motor_stop.last_trigger_time = GetTime();
-
-				// Deactivate other flags
-				mf_motor_vel_control.active = false;
-				mf_timed_pwm.active = false;
 			}
 			else if(bat_val < 3.0) // Battery Low
 			{
@@ -822,6 +816,9 @@ void Message_Handling_Task()
 			// Check power levels
 			if(bat_val >= 4.75)
 			{
+				// Reset all motor control related flags
+				Reset_Drive_Flags();
+
 				float distance_left = 0;
 				float distance_right = 0;
 				float velocity_left = 0;
@@ -867,11 +864,6 @@ void Message_Handling_Task()
 				// Set flags
 				mf_motor_vel_control.active = true;
 				mf_motor_vel_control.duration = ctr_LeftMotor.update_period;
-
-				// Deactivate other flags
-				mf_motor_dist_control.active = false;
-				mf_motor_stop.active = false;
-				mf_timed_pwm.active = false;
 			}
 			else if(bat_val < 3.0) // Battery Low
 			{
@@ -922,6 +914,9 @@ void Message_Handling_Task()
 			// Check power levels
 			if(bat_val >= 4.75)
 			{
+				// Reset all motor control related flags
+				Reset_Drive_Flags();
+
 				float distance_left = 0;
 				float distance_right = 0;
 				float velocity_left = 0;
@@ -970,10 +965,6 @@ void Message_Handling_Task()
 				mf_motor_stop.active = true;
 				mf_motor_stop.duration = data.duration * 1000;
 				mf_motor_stop.last_trigger_time = GetTime();
-
-				// Deactivate other flags
-				mf_motor_dist_control.active = false;
-				mf_timed_pwm.active = false;
 			}
 			else if(bat_val < 3.0) // Battery Low
 			{
@@ -1067,46 +1058,56 @@ void Message_Handling_Task()
   case 'O':	// Object Avoidance
     if( usb_msg_length() >= MEGN540_Message_Len('O') )
     {
-      // Remove first byte
-      usb_msg_get();
+		// Remove first byte
+		usb_msg_get();
 
-      // Build structure to put data in
-      struct __attribute__((__packed__)) { float duration; } data;
+		// Build structure to put data in
+		struct __attribute__((__packed__)) { float duration; } data;
 
-      // Copy the bytes from the usb receive buffer into structure
-      usb_msg_read_into( &data, sizeof(data) );
+		// Copy the bytes from the usb receive buffer into structure
+		usb_msg_read_into( &data, sizeof(data) );
 
-      if(data.duration > 0.0)
-      {
-        mf_obj_avoidance.active = true;
-        mf_obj_avoidance.duration = data.duration * 1000;
-      } else {
-        char bad_input = '?';
-        usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
-      }
-    }
-    break;
+		float bat_val = Battery_Voltage();
 
-  case 'X':	// Object Avoidance
-    if( usb_msg_length() >= MEGN540_Message_Len('X') )
-    {
-      mf_obj_avoidance.active = false;
-      mf_motor_dist_control.active = false;
-			mf_motor_vel_control.active = false;
-			mf_motor_stop.active = false;
-			mf_timed_pwm.active = false;
-
-      // Disable PWM
-			Motor_PWM_Enable(false);
-			// Stop PWM
-			Motor_PWM_Left(0);
-			Motor_PWM_Right(0);
-
-			// Stop controllers
-			Controller_Set_Target_Position(&ctr_LeftMotor, 0.0);
-			Controller_Set_Target_Position(&ctr_RightMotor, 0.0);
-			Controller_Set_Target_Velocity(&ctr_LeftMotor, 0.0);
-			Controller_Set_Target_Velocity(&ctr_RightMotor, 0.0);
+		// Check power levels
+		if(bat_val >= 4.75)
+		{
+			if(data.duration > 0.0)
+			{
+				// Reset all motor control related flags
+				Reset_Drive_Flags();
+				// Initialize obstacle avoidance, set flag
+				Init_Obstacle_Avoidance();
+				mf_obj_avoidance.active = true;
+				mf_obj_avoidance.duration = data.duration * 1000;
+			}
+			else {
+				char bad_input = '?';
+				usb_send_msg("cc", command, &bad_input, sizeof(bad_input));
+			}
+		}
+		else if(bat_val < 3.0) // Battery Low
+		{
+			// Create struct for message
+			struct {char let[7]; float volts; } data =
+			{
+					.let = {'B', 'A', 'T', ' ', 'L', 'O', 'W'},
+					.volts = bat_val
+			};
+			// Send bat-low message
+			usb_send_msg("ccccccccf", '!', &data, sizeof(data));
+		}
+		else // Power Off
+		{
+			// Create struct for message
+			struct {char let[9]; float volts; } data =
+			{
+					.let = {'P', 'O', 'W', 'E', 'R', ' ', 'O', 'F', 'F'},
+					.volts = bat_val
+			};
+			// Send bat-off message
+			usb_send_msg("ccccccccccf", '!', &data, sizeof(data));
+		}
     }
     break;
 
@@ -1120,6 +1121,17 @@ void Message_Handling_Task()
 
 		break;
 	}
+}
+
+/**
+ * Function Reset_Drive_Flags reset all motor control related flags and parameters
+ */
+void Reset_Drive_Flags() {
+	mf_obj_avoidance.active = false;
+	mf_motor_dist_control.active = false;
+	mf_motor_vel_control.active = false;
+	mf_motor_stop.active = false;
+	mf_timed_pwm.active = false;
 }
 
 
@@ -1164,6 +1176,7 @@ uint8_t MEGN540_Message_Len( char cmd )
 		case 'i': return	1; break;
 		case 'I': return	5; break;
 		case 'G': return	2; break;
+		case 'O': return	5; break;
 		default:  return	0; break;
 	}
 }

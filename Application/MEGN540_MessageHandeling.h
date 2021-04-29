@@ -36,34 +36,14 @@
 #define MEGN540_MESAGEHANDELING_H
 
 #include "../Driver/include_driver.h"
+#include "application_defines.h"
+#include "Obstacle_Avoidance.h"
 
 #include <math.h>
 
-#define WHEEL_BASE		0.098
-#define HALF_WHEEL_BASE	0.049
 #define TURN_VELOCITY	0.1
 #define MIN_TURN_ARC	0.04
 #define SPIN_DUTYCYLE	25
-
-/** Message Driven State Machine Flags */
-typedef struct MSG_FLAG { bool active; float duration; Time_t last_trigger_time; } MSG_FLAG_t;
-
-
-MSG_FLAG_t mf_restart;       	///<-- This flag indicates that the device received a restart command from the hoast. Default inactive.
-MSG_FLAG_t mf_loop_timer;    	///<-- Indicates if the system should report time to complete a loop.
-MSG_FLAG_t mf_time_float_send;  ///<-- Indicates if the system should report the time to send a float.
-MSG_FLAG_t mf_send_time;		///<-- Indicates if the system should send the current time.
-MSG_FLAG_t mf_send_encoder;		///<-- Indicates if the system should send encoder counts.
-MSG_FLAG_t mf_send_battery;		///<-- Indicates if the system should send the current battery level.
-MSG_FLAG_t mf_low_battery;		///<-- Indicates if the system should send a low battery warning.
-MSG_FLAG_t mf_battery_task;		///<-- Used to update the battery monitor
-MSG_FLAG_t mf_timed_pwm;		///<-- For timed PWM operation
-MSG_FLAG_t mf_sys_data;			///<-- Used to send periodic system status data
-MSG_FLAG_t mf_motor_dist_control;	///<-- Enables motor controllers for distance
-MSG_FLAG_t mf_motor_vel_control;	///<-- Enables motor controllers for velocity
-MSG_FLAG_t mf_motor_stop;		///<-- Used to set PWM and control position & velocity to zero
-MSG_FLAG_t mf_ir_proximity;		///<-- Used for IR proximity sensor
-MSG_FLAG_t mf_obj_avoidance;		///<-- Used for object avoidance
 
 /**
  * Function MSG_FLAG_Execute indicates if the action associated with the message flag should be executed
@@ -84,6 +64,11 @@ void Message_Handling_Init();
  * @return
  */
 void Message_Handling_Task();
+
+/**
+ * Function Reset_Drive_Flags reset all motor control related flags and parameters
+ */
+void Reset_Drive_Flags();
 
 /**
  * Function MEGN540_Message_Len returns the number of bytes associated with a command string per the
