@@ -36,6 +36,7 @@
 #include <avr/io.h>
 
 #include "driver_defines.h"
+#include "LED_switch.h"
 
 #define DUTY_CYCLE_MIN		8
 #define DUTY_CYCLE_MAX		16
@@ -52,11 +53,15 @@ void Servo_PWM_Init(eGripperState state);
 
 /**
  * Function Close_Servo sets the PWM duty cycle for the servo to close.
+ * NOTE: This functions DOES NOT work!
+ * TODO: Fix me!
  */
 void Close_Servo();
 
 /**
  * Function Open_Servo sets the PWM duty cycle for the servo to open.
+ * NOTE: This functions DOES NOT work!
+ * TODO: Fix me!
  */
 void Open_Servo();
 
@@ -64,5 +69,10 @@ void Open_Servo();
  * Function Servo_Is_Closed returns true if the gripper is closed
  */
 bool Servo_Is_Closed();
+
+/*
+ * Set_LEDs configures the LEDs based on OPEN/CLOSED states
+ */
+void Set_LEDs(eGripperState state);
 
 #endif

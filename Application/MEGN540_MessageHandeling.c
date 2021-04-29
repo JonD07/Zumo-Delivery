@@ -1132,6 +1132,9 @@ void Reset_Drive_Flags() {
 	mf_motor_vel_control.active = false;
 	mf_motor_stop.active = false;
 	mf_timed_pwm.active = false;
+
+	// Turn off red LED
+	Set_LED(RED, false);
 }
 
 
