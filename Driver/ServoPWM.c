@@ -3,9 +3,6 @@
 /**
  * Function Servo_PWM_Init initializes a PWM signal on Timer 4 for the gripper
  * servo motor.
- *
- * TODO: For safety (and the sake of not having fun), make sure that this is
- * initialized to the open position
  */
 void Servo_PWM_Init(eGripperState state)
 {
@@ -23,8 +20,16 @@ void Servo_PWM_Init(eGripperState state)
 	// Set DDR pin to write for OC4A -> PC7
 	DDRC |= (1 << DDC7);
 
-	// Set compare value
-	OCR4A = (state == OPEN) ? DUTY_CYCLE_OPEN : DUTY_CYCLE_CLOSED;
+	if(state == OPEN) {
+		// Set compare value
+		OCR4A = DUTY_CYCLE_OPEN;
+		Set_LEDs(OPEN);
+	}
+	else {
+		// Set compare value
+		OCR4A = DUTY_CYCLE_CLOSED;
+		Set_LEDs(CLOSE);
+	}
 
 	// Configure timer
 	uint8_t oldSREG = SREG;
@@ -48,6 +53,9 @@ void Close_Servo()
 	// Set compare value
 	OCR4A = DUTY_CYCLE_MAX;
 	SREG = oldSREG;
+
+	// Set LEDs
+	Set_LEDs(CLOSE);
 }
 
 /**
@@ -61,6 +69,9 @@ void Open_Servo()
 	// Set compare value
 	OCR4A = DUTY_CYCLE_MIN;
 	SREG = oldSREG;
+
+	// Set LEDs
+	Set_LEDs(OPEN);
 }
 
 /**
@@ -69,4 +80,25 @@ void Open_Servo()
 bool Servo_Is_Closed()
 {
 	return (OCR4A < (DUTY_CYCLE_MIN + 10));
+}
+
+/*
+ * Set_LEDs configures the LEDs based on OPEN/CLOSED states
+ */
+void Set_LEDs(eGripperState state) {
+	if(state == OPEN) {
+		// Turn on green, turn off blue
+		Set_LED(GREEN, true);
+		Set_LED(BLUE, false);
+	}
+	else if(state == CLOSE) {
+		// Turn on blue, turn off green
+		Set_LED(BLUE, true);
+		Set_LED(GREEN, false);
+	}
+	else {
+		// Thing went wrong.. turn everything off
+		Set_LED(GREEN, false);
+		Set_LED(BLUE, false);
+	}
 }

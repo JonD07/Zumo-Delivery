@@ -54,6 +54,8 @@ void InitializeSystem()
 	Encoders_Init();
 	// Initialize battery monitor
 	Battery_Monitor_Init();
+	// Initialize LED pins
+	LED_Init();
 	// Initialize PMW
 	Motor_PWM_Init(0x190); // 400 => 20 kHz
 	// Initialize IR proximity sensor

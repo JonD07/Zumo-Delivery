@@ -118,6 +118,9 @@ void Run_State_Machine(t_ProximityReturn ir_Return) {
 		// Set motor control flags
 		mf_motor_vel_control.active = true;
 		mf_motor_vel_control.duration = ctr_LeftMotor.update_period;
+
+		// Turn on red LED
+		Set_LED(RED, true);
 		break;
 	}
 

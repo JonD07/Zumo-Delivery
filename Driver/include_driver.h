@@ -8,6 +8,7 @@
 #include "driver_defines.h"
 #include "Encoder.h"
 #include "Filter.h"
+#include "LED_switch.h"
 #include "MotorPWM.h"
 #include "Proximity.h"
 #include "Ring_Buffer.h"
