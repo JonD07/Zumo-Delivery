@@ -1036,13 +1036,13 @@ void Message_Handling_Task()
 			char command;
 			usb_msg_read_into( &command, sizeof(command) );
 
-			if(command == '0')
+			if(command == 'O')
 			{
 				// Open the gripper
 //				void Open_Servo();
 				Servo_PWM_Init(OPEN);
 			}
-			else if (command == 'e') {
+			else if (command == 'C') {
 				// Close the gripper
 //				void Close_Servo();
 				Servo_PWM_Init(CLOSE);
